@@ -17,12 +17,17 @@ class Environment:
         self.width = width
         self.height = height
 
+        # initialize matrix with zeros representing the map
         self.grid = np.zeros((self.height, self.width))
 
+        # initialize robot/s
         self.robot = robot
 
         self.obstacles = []
+
+        # obstacle coordinates, handy for wall collision
         self.obstacles_coord = []
+
         if obstacles is not None:
             self.add_obstacles(obstacles)
 
