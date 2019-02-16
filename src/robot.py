@@ -8,9 +8,9 @@ class Robot:
 
         self.position = initial_position
 
-        # Motor variables
-        self.MAX_SPEED = 100
-        self.MIN_SPEED = -100
+        # Angular speed of wheel is in degrees per seconds
+        self.MAX_SPEED = 50
+        self.MIN_SPEED = -50
         self.left_wheel_speed = 0
         self.right_wheel_speed = 0
 
