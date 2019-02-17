@@ -29,13 +29,13 @@ class Robot:
     def move(self):
         if self.left_wheel_velocity != self.right_wheel_velocity:
             # Calculate ω - angular velocity and change rotation of the robot
-            angular_velocity = (self.right_wheel_velocity - self.left_wheel_velocity) / self.diameter
+            angular_velocity = (self.left_wheel_velocity - self.right_wheel_velocity) / self.diameter
 
             # Keep theta from exploding
             self.theta %= 2*np.pi
 
             R = (self.diameter / 2) * (self.left_wheel_velocity + self.right_wheel_velocity) / (
-                    self.right_wheel_velocity - self.left_wheel_velocity)
+                    self.left_wheel_velocity - self.right_wheel_velocity)
 
             ICCx = self.position[0] - R * np.sin(self.theta)
             ICCy = self.position[1] + R * np.cos(self.theta)

@@ -81,8 +81,6 @@ def game_loop():
         gameDisplay.blit(osd_3, (0, SCREEN_HEIGHT - 40))
         gameDisplay.blit(osd_4, (0, SCREEN_HEIGHT - 20))
 
-        # Calculate degrees
-        print(robot.theta)
         # TODO It doesn't work for now
         # robotImage = pygame.transform.rotate(robotImage, robot.theta * 180 / np.pi)
         gameDisplay.blit(robotImage, (robot.position[0], robot.position[1]))
