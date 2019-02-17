@@ -7,6 +7,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+ROBOT_DIAMETER = 50
 # environment without obstacles
 # env = Environment()
 # environment with obstacles
@@ -42,10 +43,10 @@ wall3 = pygame.Surface([63, 3])
 wall3.fill(BLACK)
 walls.append(wall3)
 
-robot = Robot(10, 0, [100, 100])
+robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
 
 robotImage = pygame.image.load('../assets/robot.png')
-robotImage = pygame.transform.scale(robotImage, (50, 50))
+robotImage = pygame.transform.scale(robotImage, (ROBOT_DIAMETER, ROBOT_DIAMETER))
 
 gameDisplay.blit(wall1, (0, 20))
 gameDisplay.blit(wall2, (80, 0))

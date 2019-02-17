@@ -52,19 +52,19 @@ class Robot:
             self.position[1] = self.position[1] + (self.right_wheel_velocity * np.sin(self.theta))
 
     def increment_left_wheel(self):
-        if self.left_wheel_velocity + 1 <= self.MAX_SPEED and self.left_wheel_velocity >= self.MIN_SPEED:
+        if self.left_wheel_velocity + 1 <= self.MAX_SPEED:
             self.left_wheel_velocity += 1
 
     def decrement_left_wheel(self):
-        if self.left_wheel_velocity + 1 <= self.MAX_SPEED and self.left_wheel_velocity >= self.MIN_SPEED:
+        if self.left_wheel_velocity - 1>= self.MIN_SPEED:
             self.left_wheel_velocity -= 1
 
     def increment_right_wheel(self):
-        if self.right_wheel_velocity + 1 <= self.MAX_SPEED and self.right_wheel_velocity >= self.MIN_SPEED:
+        if self.right_wheel_velocity + 1 <= self.MAX_SPEED:
             self.right_wheel_velocity += 1
 
     def decrement_right_wheel(self):
-        if self.right_wheel_velocity + 1 <= self.MAX_SPEED and self.right_wheel_velocity >= self.MIN_SPEED:
+        if self.right_wheel_velocity - 1 >= self.MIN_SPEED:
             self.right_wheel_velocity -= 1
 
     def increment_both_wheels(self):
