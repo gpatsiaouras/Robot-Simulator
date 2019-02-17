@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import pygame
 
 
 class Environment:
@@ -19,7 +20,9 @@ class Environment:
 
         # initialize matrix with zeros representing the map
         self.grid = np.zeros((self.height, self.width))
-
+        self.map = pygame.Surface([self.height, self.width])
+        self.map.fill((255, 255, 255))
+        self.rect = self.map.get_rect()
         # initialize robot/s
         self.robot = robot
 
@@ -47,3 +50,6 @@ class Environment:
         plt.gca().axes.get_yaxis().set_visible(False)
         plt.draw()
         plt.pause(0.001)
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
