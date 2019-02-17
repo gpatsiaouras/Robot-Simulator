@@ -33,7 +33,6 @@ class Robot:
             self.sensors_coords[count, 3] = self.position[1] + self.sens_radius * np.sin(self.theta + np.radians(angle))
             count = count + 1
 
-
     def move(self):
         if self.left_wheel_velocity != self.right_wheel_velocity:
             # Calculate ω - angular velocity and change rotation of the robot

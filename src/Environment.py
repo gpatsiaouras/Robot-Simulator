@@ -75,14 +75,14 @@ class Environment:
             osd_text_2 = 'Left Wheel:{0}'.format(self.robot.left_wheel_velocity)
             osd_text_3 = 'Right Wheel:{0}'.format(self.robot.right_wheel_velocity)
             osd_text_4 = 'Theta:{0}'.format(self.robot.theta)
-            self.osd_1 = self.myfont.render(osd_text_1, False, (0, 0, 0))
-            self.osd_2 = self.myfont.render(osd_text_2, False, (0, 0, 0))
-            self.osd_3 = self.myfont.render(osd_text_3, False, (0, 0, 0))
-            self.osd_4 = self.myfont.render(osd_text_4, False, (0, 0, 0))
-            self.gameDisplay.blit(self.osd_1, (0, self.height - 80))
-            self.gameDisplay.blit(self.osd_2, (0, self.height - 60))
-            self.gameDisplay.blit(self.osd_3, (0, self.height - 40))
-            self.gameDisplay.blit(self.osd_4, (0, self.height - 20))
+            osd_1 = self.myfont.render(osd_text_1, False, (0, 0, 0))
+            osd_2 = self.myfont.render(osd_text_2, False, (0, 0, 0))
+            osd_3 = self.myfont.render(osd_text_3, False, (0, 0, 0))
+            osd_4 = self.myfont.render(osd_text_4, False, (0, 0, 0))
+            self.gameDisplay.blit(osd_1, (0, self.height - 80))
+            self.gameDisplay.blit(osd_2, (0, self.height - 60))
+            self.gameDisplay.blit(osd_3, (0, self.height - 40))
+            self.gameDisplay.blit(osd_4, (0, self.height - 20))
 
             pygame.draw.circle(self.gameDisplay, self.BLACK, [int(self.robot.position[0]), int(self.robot.position[1])], 50, 3)
             end_x = self.robot.diameter * np.cos(2 * np.pi + self.robot.theta)
@@ -99,4 +99,3 @@ class Environment:
                                      [int(sensor[0]), int(sensor[1])],
                                      [int(sensor[2]), int(sensor[3])],
                                      3)
-
