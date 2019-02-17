@@ -10,45 +10,10 @@ import numpy as np
 ROBOT_DIAMETER = 50
 # environment
 
-# pygame.init()
-# pygame.font.init()
-# myfont = pygame.font.SysFont('Comic Sans MS', 30)
-#
-# gameDisplay = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-# pygame.display.set_caption('Differential Robot Simulator')
-# clock = pygame.time.Clock()
-
-# wall_lenght = (SCREEN_HEIGHT / 4) * 3 if SCREEN_HEIGHT < SCREEN_WIDTH else (SCREEN_WIDTH / 4) * 3
-# wall_thickness = 3
-#
-# walls = []
-#
-# wall1 = pygame.Surface([wall_lenght, wall_thickness])
-# wall1.fill(BLACK)
-# walls.append(wall1)
-#
-# wall2 = pygame.Surface([wall_thickness, wall_lenght])
-# wall2.fill(BLACK)
-# walls.append(wall2)
-#
-# wall3 = pygame.Surface([wall_lenght, wall_thickness])
-# wall3.fill(BLACK)
-# walls.append(wall3)
 
 robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
 env = Environment(robot=robot)
 
-# robotImage = pygame.image.load('../assets/robot.png')
-# robotImage = pygame.transform.scale(robotImage, (ROBOT_DIAMETER, ROBOT_DIAMETER))
-
-
-# gameDisplay.blit(wall1, (0, SCREEN_HEIGHT/3))
-# gameDisplay.blit(wall2, (SCREEN_WIDTH/4*3, 0))
-# gameDisplay.blit(wall3, (SCREEN_WIDTH/4, (SCREEN_HEIGHT / 4) * 3))
-#
-#
-# gameDisplay.blit(robotImage, (100, 100))
-# gameDisplay.fill(WHITE)
 gameExit = False
 
 
