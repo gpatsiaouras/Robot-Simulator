@@ -45,14 +45,14 @@ walls.append(wall3)
 
 robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
 
-robotImage = pygame.image.load('../assets/robot.png')
-robotImage = pygame.transform.scale(robotImage, (ROBOT_DIAMETER, ROBOT_DIAMETER))
+# robotImage = pygame.image.load('../assets/robot.png')
+# robotImage = pygame.transform.scale(robotImage, (ROBOT_DIAMETER, ROBOT_DIAMETER))
 
 gameDisplay.blit(wall1, (0, 20))
 gameDisplay.blit(wall2, (80, 0))
 gameDisplay.blit(wall3, (20, 43))
 
-gameDisplay.blit(robotImage, (100, 100))
+# gameDisplay.blit(robotImage, (100, 100))
 gameDisplay.fill(WHITE)
 gameExit = False
 
@@ -84,7 +84,14 @@ def game_loop():
 
         # TODO It doesn't work for now
         # robotImage = pygame.transform.rotate(robotImage, robot.theta * 180 / np.pi)
-        gameDisplay.blit(robotImage, (robot.position[0], robot.position[1]))
+        # gameDisplay.blit(robotImage, (robot.position[0], robot.position[1]))
+        pygame.draw.circle(gameDisplay, BLACK, [int(robot.position[0]), int(robot.position[1])], 50, 3)
+        end_x = robot.diameter * np.cos(2 * np.pi + robot.theta)
+        end_y = robot.diameter * np.sin(2 * np.pi + robot.theta)
+        pygame.draw.line(gameDisplay, BLACK,
+                         [int(robot.position[0]), int(robot.position[1])],
+                         [int(robot.position[0] + end_x), int(robot.position[1] + end_y)],
+                         3)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
