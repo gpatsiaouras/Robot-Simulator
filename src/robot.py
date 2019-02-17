@@ -18,13 +18,21 @@ class Robot:
         self.right_wheel_velocity = 0
 
         # Sensors
-        # 12 sensors perimetrically, 30o degrees between them
-        # sensor 0 is the one in front of the robot.
-        # Values go from 0 to 200, 200 being out of reach
-        self.distance_sensors = [200 for i in range(12)]
+        self.distance_sensors = []
+        self.init_sensors()
 
     def update_sensor_values(self):
-        pass
+        count = 0
+        for angle in range(0, 360, 30):
+            # sensor origin coords
+            self.sensors_coords[count, 0] = self.position[0] + self.radius * np.cos(self.theta + np.radians(angle))
+            self.sensors_coords[count, 1] = self.position[1] + self.radius * np.sin(self.theta + np.radians(angle))
+
+            # sensor tips coords
+            self.sensors_coords[count, 2] = self.position[0] + self.sens_radius * np.cos(self.theta + np.radians(angle))
+            self.sensors_coords[count, 3] = self.position[1] + self.sens_radius * np.sin(self.theta + np.radians(angle))
+            count = count + 1
+
 
     def move(self):
         if self.left_wheel_velocity != self.right_wheel_velocity:
@@ -50,6 +58,9 @@ class Robot:
         elif self.right_wheel_velocity != 0:
             self.position[0] = self.position[0] + (self.right_wheel_velocity * np.cos(self.theta))
             self.position[1] = self.position[1] + (self.right_wheel_velocity * np.sin(self.theta))
+
+        # update sensors coords
+        self.update_sensor_values()
 
     def increment_left_wheel(self):
         if self.left_wheel_velocity + 1 <= self.MAX_SPEED:
@@ -78,3 +89,11 @@ class Robot:
     def stop_motors(self):
         self.right_wheel_velocity = 0
         self.left_wheel_velocity = 0
+
+    def init_sensors(self):
+        # 12 sensors perimetrically, 30o degrees between them
+        # sensor 0 is the one in front of the robot.
+        # Values go from 0 to 200, 200 being out of reach
+        self.distance_sensors = [200 for i in range(12)]
+        self.sensors_coords = np.zeros((12, 4))
+        self.sens_radius = 3 * self.radius

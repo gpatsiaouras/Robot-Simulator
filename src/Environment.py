@@ -5,6 +5,7 @@ import pygame
 class Environment:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
+    GREEN = (0, 255, 0)
     ROBOT_DIAMETER = 50
 
     def __init__(self, width=800, height=800, obstacles=None, robot=None):
@@ -90,4 +91,12 @@ class Environment:
                              [int(self.robot.position[0]), int(self.robot.position[1])],
                              [int(self.robot.position[0] + end_x), int(self.robot.position[1] + end_y)],
                              3)
+
+            # check if sensor list is not empty
+            if len(self.robot.sensors_coords) != 0:
+                for sensor in self.robot.sensors_coords:
+                    pygame.draw.line(self.gameDisplay, self.GREEN,
+                                     [int(sensor[0]), int(sensor[1])],
+                                     [int(sensor[2]), int(sensor[3])],
+                                     3)
 
