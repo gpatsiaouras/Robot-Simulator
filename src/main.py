@@ -11,7 +11,7 @@ env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, None, robot)
 robot.setObst(env.obstacles, env.obstacles_parameters)
 
 gameExit = False
-
+env.render()
 
 def game_loop():
     while not gameExit:

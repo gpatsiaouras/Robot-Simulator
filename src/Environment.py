@@ -123,7 +123,7 @@ class Environment:
             self.gameDisplay.blit(osd_3, (0, self.height - 40))
             self.gameDisplay.blit(osd_4, (0, self.height - 20))
 
-            pygame.draw.circle(self.gameDisplay, self.BLACK, [int(self.robot.position[0]), int(self.robot.position[1])],
+            self.robot.robot_rect = pygame.draw.circle(self.gameDisplay, self.BLACK, [int(self.robot.position[0]), int(self.robot.position[1])],
                                50, 3)
             end_x = self.robot.diameter * np.cos(2 * np.pi + self.robot.theta)
             end_y = self.robot.diameter * np.sin(2 * np.pi + self.robot.theta)

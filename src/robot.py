@@ -26,6 +26,8 @@ class Robot:
         self.walls = []
         self.walls_parameters = np.zeros((4, 2))
 
+        self.robot_rect = None
+
     def update_sensor_values(self):
         count = 0
         for angle in range(0, 360, 30):
@@ -38,17 +40,17 @@ class Robot:
             self.sensors_coords[count, 3] = self.position[1] + self.sens_radius * np.sin(self.theta + np.radians(angle))
 
             # sensors functions parameters
-            # slope m
-            self.sensors_parameters[count, 0] = (self.sensors_coords[count, 2] - self.sensors_coords[count, 3]) / \
-                                                (self.sensors_coords[count, 0] - self.sensors_coords[count, 1])
-            # intercept q
+            # slope a
+            self.sensors_parameters[count, 0] = (self.sensors_coords[count, 3] - self.sensors_coords[count, 2]) / \
+                                                (self.sensors_coords[count, 1] - self.sensors_coords[count, 0])
+            # intercept b
             self.sensors_parameters[count, 1] = self.sensors_coords[count, 1] - (
                     self.sensors_parameters[count, 0] * self.sensors_coords[count, 0])
 
             count = count + 1
-        # print(self.sensors_parameters)
 
     def move(self):
+        self.check_collition()
         if self.left_wheel_velocity != self.right_wheel_velocity:
             # Calculate ω - angular velocity and change rotation of the robot
             angular_velocity = (self.left_wheel_velocity - self.right_wheel_velocity) / self.diameter
@@ -118,19 +120,27 @@ class Robot:
         self.walls = walls
         self.walls_parameters = walls_params
 
-
     def check_sensors(self):
         for sensor in range(len(self.sensors_rects)):
             for wall in range(len(self.walls)):
                 if self.sensors_rects[sensor].colliderect(self.walls[wall]):
-                    # print(wall)
-                    # print(sensor)
-                    wall_params = self.walls_parameters[wall]
-                    sensor_params = self.sensors_parameters[sensor]
-                    a = np.array([[-wall_params[0], 1], [sensor_params[0], 1]])
-                    b = np.array([wall_params[1], sensor_params[1]])
+                    pass
+                    # wall_params = self.walls_parameters[wall]
+                    # sensor_params = self.sensors_parameters[sensor]
+                    # a = np.array([[-wall_params[0], 1], [sensor_params[0], 1]])
+                    # b = np.array([wall_params[1], sensor_params[1]])
+                    #
+                    # intersection_coord = np.linalg.solve(a, b)
+                    #
+                    # self.sensors_values[sensor] = np.sqrt((intersection_coord[0] - self.sensors_coords[0, 0])**2 + (intersection_coord[1] - self.sensors_coords[0, 1])**2)
+                    # print("sensor ", sensor, "=  ", self.sensors_values[sensor])
 
-                    intersection_coord = np.linalg.solve(a, b)
-
-                    self.sensors_values[sensor] = np.sqrt((intersection_coord[0] - self.sensors_coords[0, 0])**2 + (intersection_coord[1] - self.sensors_coords[0, 1])**2)
-                    print("sensor ", sensor, "=  ", self.sensors_values[sensor])
+    def check_collition(self):
+        for wall in self.walls:
+            if self.robot_rect.colliderect(wall):
+                # TODO When you hit the wall stop all motors. This is wrong
+                # This is where the collition handling will take place meaning.
+                # When you hit the wall break the velocity to Vx and Vy. One of the two is perpendicular to the wall
+                # so it doesn't contribute to the movement of the robot. The other one will move the robot parallel
+                # to the wall. That's what we need to do.
+                self.stop_motors()
