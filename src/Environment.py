@@ -28,10 +28,14 @@ class Environment:
         # initialize robot/s
         self.robot = robot
 
+        # OBSTACLES
         self.obstacles = []
 
         # obstacle coordinates, handy for wall collision
-        self.obstacles_coord = []
+        self.obstacles_coord = np.zeros((3, 4))
+
+        # obstacles parameters, handy for sensor values
+        self.obstacles_parameters = np.zeros((3,2))
 
         pygame.init()
         pygame.font.init()
@@ -47,25 +51,47 @@ class Environment:
         self.wall_lenght = (self.height / 4) * 3 if self.height < self.width else (self.width / 4) * 3
         self.wall_thickness = 3
 
-        self.walls = []
+        # wall 1 origin x,y and ending x, y
+        self.obstacles_coord[0, 0] = 0
+        self.obstacles_coord[0, 1] = self.height / 3
+        self.obstacles_coord[0, 2] = self.wall_lenght
+        self.obstacles_coord[0, 3] = self.height / 3
 
-        self.wall1 = pygame.draw.line(self.gameDisplay, self.BLACK, (0, self.height / 3),
-                                      (self.wall_lenght, self.height / 3), 3)
-        # self.wall1 = pygame.Surface([self.wall_lenght, self.wall_thickness])
-        # self.wall1.fill(self.BLACK)
-        self.walls.append(self.wall1)
+        # wall 2 origin x,y and ending x, y
+        self.obstacles_coord[1, 0] = self.width / 4 * 3
+        self.obstacles_coord[1, 1] = 0
+        self.obstacles_coord[1, 2] = self.width / 4 * 3
+        self.obstacles_coord[1, 3] = self.wall_lenght
 
-        self.wall2 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4 * 3, 0),
-                                      (self.width / 4 * 3, self.wall_lenght), 3)
-        # self.wall2 = pygame.Surface([self.wall_thickness, self.wall_lenght])
-        # self.wall2.fill(self.BLACK)
-        self.walls.append(self.wall2)
+        # wall 3 origin x,y and ending x, y
+        self.obstacles_coord[2, 0] = self.width / 4
+        self.obstacles_coord[2, 1] = (self.height / 6) * 5
+        self.obstacles_coord[2, 2] = (self.width / 4) + self.wall_lenght
+        self.obstacles_coord[2, 3] = (self.height / 6) * 5
 
-        self.wall3 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4, (self.height / 6) * 5),
-                                      ((self.width / 4) + self.wall_lenght, (self.height / 6) * 5), 3)
-        # self.wall3 = pygame.Surface([self.wall_lenght, self.wall_thickness])
-        # self.wall3.fill(self.BLACK)
-        self.walls.append(self.wall3)
+        # obstacles parameters
+        count = 0
+        for obst in self.obstacles_coord:
+            # sensors functions parameters
+            # slope m
+            self.obstacles_parameters[count, 0] = (self.obstacles_coord[count, 2] - self.obstacles_coord[count, 3]) / \
+                                                (self.obstacles_coord[count, 0] - self.obstacles_coord[count, 1])
+            # intercept q
+            self.obstacles_parameters[count, 1] = self.obstacles_coord[count, 1] - (
+                    self.obstacles_parameters[count, 0] * self.obstacles_coord[count, 0])
+            count = count + 1
+
+        wall1 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[0, 0], self.obstacles_coord[0, 1]),
+                                 (self.obstacles_coord[0, 2], self.obstacles_coord[0, 3]), 3)
+        self.obstacles.append(wall1)
+
+        wall2 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[1, 0], self.obstacles_coord[1, 1]),
+                                 (self.obstacles_coord[1, 2], self.obstacles_coord[1, 3]), 3)
+        self.obstacles.append(wall2)
+
+        wall3 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[2, 0], self.obstacles_coord[2, 1]),
+                                 (self.obstacles_coord[2, 2], self.obstacles_coord[2, 3]), 3)
+        self.obstacles.append(wall3)
 
     # TODO Created this one that ONLY redraws the lines.
     def redraw_obstracles(self):
@@ -82,10 +108,6 @@ class Environment:
         self.gameDisplay.fill(self.WHITE)
         # Redraw with the new position
         self.redraw_obstracles()
-        # TODO this is not possible that's why I commented it
-        # self.gameDisplay.blit(self.wall1, (0, self.height / 3))
-        # self.gameDisplay.blit(self.wall2, (self.width / 4 * 3, 0))
-        # self.gameDisplay.blit(self.wall3, (self.width / 4, (self.height / 4) * 3))
 
         if self.robot is not None:
             osd_text_1 = 'Robot Velocity:'

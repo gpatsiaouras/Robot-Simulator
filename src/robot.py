@@ -111,22 +111,26 @@ class Robot:
         # Values go from 0 to 200, 200 being out of reach
         self.sensors_values = [200 for i in range(12)]
         self.sensors_coords = np.zeros((12, 4))
-        self.sens_radius = 3 * self.radius
+        # self.sens_radius = 3 * self.radius
+        self.sens_radius = 200
 
-    def setObst(self, walls):
+    def setObst(self, walls, walls_params):
         self.walls = walls
-        self.walls_parameters = np.zeros((len(walls), 2))
-        c = 0
-        for wall in walls:
-            # slope m
-            # TODO: change m and q calculation considering that now walls are lines
-            self.walls_parameters[c, 0] = wall.bottomleft[0] - wall.bottomright[0] / wall.bottomleft[1] - wall.bottomright[1]
-            # intercept q
-            self.walls_parameters[c, 1] = wall.bottomleft[1] - (self.walls_parameters[c, 0] * wall.bottomleft[0])
+        self.walls_parameters = walls_params
+
 
     def check_sensors(self):
-        for sensor in self.sensors_rects:
-            for wall in self.walls:
-                if sensor.colliderect(wall):
-                    print(wall)
-                    print(sensor)
+        for sensor in range(len(self.sensors_rects)):
+            for wall in range(len(self.walls)):
+                if self.sensors_rects[sensor].colliderect(self.walls[wall]):
+                    # print(wall)
+                    # print(sensor)
+                    wall_params = self.walls_parameters[wall]
+                    sensor_params = self.sensors_parameters[sensor]
+                    a = np.array([[-wall_params[0], 1], [sensor_params[0], 1]])
+                    b = np.array([wall_params[1], sensor_params[1]])
+
+                    intersection_coord = np.linalg.solve(a, b)
+
+                    self.sensors_values[sensor] = np.sqrt((intersection_coord[0] - self.sensors_coords[0, 0])**2 + (intersection_coord[1] - self.sensors_coords[0, 1])**2)
+                    print("sensor ", sensor, "=  ", self.sensors_values[sensor])
