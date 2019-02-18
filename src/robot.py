@@ -46,7 +46,7 @@ class Robot:
                     self.sensors_parameters[count, 0] * self.sensors_coords[count, 0])
 
             count = count + 1
-        print(self.sensors_parameters)
+        # print(self.sensors_parameters)
 
     def move(self):
         if self.left_wheel_velocity != self.right_wheel_velocity:
@@ -120,8 +120,7 @@ class Robot:
         for wall in walls:
             # slope m
             # TODO: change m and q calculation considering that now walls are lines
-            self.walls_parameters[c, 0] = (wall.bottomleft[1] - wall.topleft[1]) / (
-                        wall.bottomleft[0] - wall.topleft[0])
+            self.walls_parameters[c, 0] = wall.bottomleft[0] - wall.bottomright[0] / wall.bottomleft[1] - wall.bottomright[1]
             # intercept q
             self.walls_parameters[c, 1] = wall.bottomleft[1] - (self.walls_parameters[c, 0] * wall.bottomleft[0])
 
@@ -129,4 +128,5 @@ class Robot:
         for sensor in self.sensors_rects:
             for wall in self.walls:
                 if sensor.colliderect(wall):
-                    pass
+                    print(wall)
+                    print(sensor)

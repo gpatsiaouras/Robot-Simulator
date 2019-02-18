@@ -67,14 +67,25 @@ class Environment:
         # self.wall3.fill(self.BLACK)
         self.walls.append(self.wall3)
 
+    # TODO Created this one that ONLY redraws the lines.
+    def redraw_obstracles(self):
+        pygame.draw.line(self.gameDisplay, self.BLACK, (0, self.height / 3),
+                         (self.wall_lenght, self.height / 3), 3)
+        pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4 * 3, 0),
+                         (self.width / 4 * 3, self.wall_lenght), 3)
+        pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4, (self.height / 6) * 5),
+                         ((self.width / 4) + self.wall_lenght, (self.height / 6) * 5), 3)
+
     def render(self):
 
         # Draw everything white
         self.gameDisplay.fill(self.WHITE)
         # Redraw with the new position
-        self.gameDisplay.blit(self.wall1, (0, self.height / 3))
-        self.gameDisplay.blit(self.wall2, (self.width / 4 * 3, 0))
-        self.gameDisplay.blit(self.wall3, (self.width / 4, (self.height / 4) * 3))
+        self.redraw_obstracles()
+        # TODO this is not possible that's why I commented it
+        # self.gameDisplay.blit(self.wall1, (0, self.height / 3))
+        # self.gameDisplay.blit(self.wall2, (self.width / 4 * 3, 0))
+        # self.gameDisplay.blit(self.wall3, (self.width / 4, (self.height / 4) * 3))
 
         if self.robot is not None:
             osd_text_1 = 'Robot Velocity:'
