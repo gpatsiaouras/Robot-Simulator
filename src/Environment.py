@@ -49,16 +49,22 @@ class Environment:
 
         self.walls = []
 
-        self.wall1 = pygame.Surface([self.wall_lenght, self.wall_thickness])
-        self.wall1.fill(self.BLACK)
+        self.wall1 = pygame.draw.line(self.gameDisplay, self.BLACK, (0, self.height / 3),
+                                      (self.wall_lenght, self.height / 3), 3)
+        # self.wall1 = pygame.Surface([self.wall_lenght, self.wall_thickness])
+        # self.wall1.fill(self.BLACK)
         self.walls.append(self.wall1)
 
-        self.wall2 = pygame.Surface([self.wall_thickness, self.wall_lenght])
-        self.wall2.fill(self.BLACK)
+        self.wall2 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4 * 3, 0),
+                                      (self.width / 4 * 3, self.wall_lenght), 3)
+        # self.wall2 = pygame.Surface([self.wall_thickness, self.wall_lenght])
+        # self.wall2.fill(self.BLACK)
         self.walls.append(self.wall2)
 
-        self.wall3 = pygame.Surface([self.wall_lenght, self.wall_thickness])
-        self.wall3.fill(self.BLACK)
+        self.wall3 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4, (self.height / 6) * 5),
+                                      ((self.width / 4) + self.wall_lenght, (self.height / 6) * 5), 3)
+        # self.wall3 = pygame.Surface([self.wall_lenght, self.wall_thickness])
+        # self.wall3.fill(self.BLACK)
         self.walls.append(self.wall3)
 
     def render(self):
@@ -66,7 +72,7 @@ class Environment:
         # Draw everything white
         self.gameDisplay.fill(self.WHITE)
         # Redraw with the new position
-        self.gameDisplay.blit(self.wall1, (0, self.height/ 3))
+        self.gameDisplay.blit(self.wall1, (0, self.height / 3))
         self.gameDisplay.blit(self.wall2, (self.width / 4 * 3, 0))
         self.gameDisplay.blit(self.wall3, (self.width / 4, (self.height / 4) * 3))
 
@@ -84,7 +90,8 @@ class Environment:
             self.gameDisplay.blit(osd_3, (0, self.height - 40))
             self.gameDisplay.blit(osd_4, (0, self.height - 20))
 
-            pygame.draw.circle(self.gameDisplay, self.BLACK, [int(self.robot.position[0]), int(self.robot.position[1])], 50, 3)
+            pygame.draw.circle(self.gameDisplay, self.BLACK, [int(self.robot.position[0]), int(self.robot.position[1])],
+                               50, 3)
             end_x = self.robot.diameter * np.cos(2 * np.pi + self.robot.theta)
             end_y = self.robot.diameter * np.sin(2 * np.pi + self.robot.theta)
             pygame.draw.line(self.gameDisplay, self.BLACK,
@@ -94,8 +101,10 @@ class Environment:
 
             # check if sensor list is not empty
             if len(self.robot.sensors_coords) != 0:
+                updated_sensors = []
                 for sensor in self.robot.sensors_coords:
-                    pygame.draw.line(self.gameDisplay, self.GREEN,
-                                     [int(sensor[0]), int(sensor[1])],
-                                     [int(sensor[2]), int(sensor[3])],
-                                     3)
+                    updated_sensors.append(pygame.draw.line(self.gameDisplay, self.GREEN,
+                                                            [int(sensor[0]), int(sensor[1])],
+                                                            [int(sensor[2]), int(sensor[3])],
+                                                            3))
+                self.robot.sensors_rects = updated_sensors

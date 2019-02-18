@@ -8,6 +8,7 @@ ROBOT_DIAMETER = 50
 
 robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
 env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, None, robot)
+robot.setObst(env.walls)
 
 gameExit = False
 
@@ -15,6 +16,7 @@ gameExit = False
 def game_loop():
     while not gameExit:
         robot.move()
+        robot.check_sensors()
         env.render()
 
         for event in pygame.event.get():
