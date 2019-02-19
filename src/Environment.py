@@ -71,12 +71,6 @@ class Environment:
         self.obstacles_coord[2, 2] = (self.width / 4) + self.wall_lenght
         self.obstacles_coord[2, 3] = (self.height / 6) * 5
 
-        # # wall 4 origin x,y and ending x, y
-        # self.obstacles_coord[3, 0] = self.wall_lenght
-        # self.obstacles_coord[3, 1] = 0
-        # self.obstacles_coord[3, 2] = self.width / 8 * 7
-        # self.obstacles_coord[3, 3] = 100
-
         # obstacles parameters
         count = 0
         for obst in self.obstacles_coord:
@@ -101,28 +95,20 @@ class Environment:
                                  (self.obstacles_coord[2, 2], self.obstacles_coord[2, 3]), 3)
         self.obstacles.append(wall3)
 
-        # wall4 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[3, 0], self.obstacles_coord[3, 1]),
-        #                          (self.obstacles_coord[3, 2], self.obstacles_coord[3, 3]), 3)
-        # self.obstacles.append(wall4)
-
-
-    # TODO Created this one that ONLY redraws the lines.
-    def redraw_obstracles(self):
+    def redraw_obstacles(self):
         pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[0, 0], self.obstacles_coord[0, 1]),
                          (self.obstacles_coord[0, 2], self.obstacles_coord[0, 3]), 3)
         pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[1, 0], self.obstacles_coord[1, 1]),
                          (self.obstacles_coord[1, 2], self.obstacles_coord[1, 3]), 3)
         pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[2, 0], self.obstacles_coord[2, 1]),
                          (self.obstacles_coord[2, 2], self.obstacles_coord[2, 3]), 3)
-        # pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[3, 0], self.obstacles_coord[3, 1]),
-        #                  (self.obstacles_coord[3, 2], self.obstacles_coord[3, 3]), 3)
 
     def render(self):
 
         # Draw everything white
         self.gameDisplay.fill(self.WHITE)
         # Redraw with the new position
-        self.redraw_obstracles()
+        self.redraw_obstacles()
 
         if self.robot is not None:
             osd_text_1 = 'Robot Velocity:'

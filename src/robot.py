@@ -23,6 +23,7 @@ class Robot:
         self.init_sensors()
         self.sensors_rects = []
         self.sensors_parameters = np.zeros((12, 2))
+
         # walls for sensor values
         self.walls = []
         self.walls_parameters = np.zeros((4, 2))
@@ -83,7 +84,7 @@ class Robot:
             self.position[0] = self.position[0] + (self.right_wheel_velocity * np.cos(self.theta))
             self.position[1] = self.position[1] + (self.right_wheel_velocity * np.sin(self.theta))
 
-        # Remove the pygame rectangle object so that the check collision can evaluate with the new position
+        # Move the pygame rectangle object so that the check collision can evaluate with the new position
         self.robot_rect.move_ip(self.position[0] - old_position[0], self.position[1] - old_position[1])
 
         # Check if the new move caused a collision
@@ -92,16 +93,13 @@ class Robot:
             self.position = old_position
             # Move according to collision handling algorithm
             self.move_with_wall()
-            # Try to move normally again
 
         # update sensors
         self.update_sensor_values()
 
     def move_with_wall(self):
-
         cap_hor = 1
         cap_ver = 1
-
         velocity_hor = 0
         velocity_ver = 0
 
@@ -158,7 +156,7 @@ class Robot:
         self.sensors_values = [0 for i in range(12)]
         self.sensors_coords = np.zeros((12, 4))
         # self.sens_radius = 3 * self.radius
-        self.sens_radius = 125
+        self.sens_radius = 100 + self.radius
 
     def setObst(self, walls, walls_params):
         self.walls = walls
@@ -195,3 +193,4 @@ class Robot:
                 count_collisions += 1
         if count_collisions > 0:
             return True
+        return False

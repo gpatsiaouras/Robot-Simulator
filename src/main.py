@@ -13,6 +13,7 @@ robot.setObst(env.obstacles, env.obstacles_parameters)
 gameExit = False
 env.render()
 
+
 def game_loop():
     while not gameExit:
         robot.move()
@@ -39,10 +40,6 @@ def game_loop():
                     robot.decrement_both_wheels()
                 if event.key == pygame.K_x:
                     robot.stop_motors()
-
-            # if event.type == pygame.KEYUP:
-            #     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-            #         robot. = 0
 
         pygame.display.update()
         env.clock.tick(25)
