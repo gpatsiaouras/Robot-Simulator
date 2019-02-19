@@ -54,13 +54,10 @@ class Robot:
             count = count + 1
 
     def move(self):
-        collition = self.check_collition()
+        # Store old position before applying kinematics
+        old_position = [self.position[0], self.position[1]]
 
-        if collition:
-            self.position[0] = self.position[0] + self.velocity_hor
-            self.position[1] = self.position[1] + self.velocity_ver
-
-        elif self.left_wheel_velocity != self.right_wheel_velocity:
+        if self.left_wheel_velocity != self.right_wheel_velocity:
             # if self.left_wheel_velocity != self.right_wheel_velocity:
             # Calculate ω - angular velocity and change rotation of the robot
             angular_velocity = (self.left_wheel_velocity - self.right_wheel_velocity) / self.diameter
@@ -86,8 +83,19 @@ class Robot:
             self.position[0] = self.position[0] + (self.right_wheel_velocity * np.cos(self.theta))
             self.position[1] = self.position[1] + (self.right_wheel_velocity * np.sin(self.theta))
 
+        # Check if the move caused a collision
+        if self.check_collision():
+            # Undo the move
+            self.position = old_position
+            # Move according to collition handling algorithm
+            self.move_with_wall()
+
         # update sensors
         self.update_sensor_values()
+
+    def move_with_wall(self):
+        self.position[0] = self.position[0] + self.velocity_hor
+        self.position[1] = self.position[1] + self.velocity_ver
 
     def increment_left_wheel(self):
         if self.left_wheel_velocity + 1 <= self.MAX_SPEED:
@@ -154,7 +162,7 @@ class Robot:
                         self.sensors_coords[sensor, 2] = intersection_coord[0]
                         self.sensors_coords[sensor, 3] = intersection_coord[1]
 
-    def check_collition(self):
+    def check_collision(self):
         count_collisions = 0
         self.cap_hor = 1
         self.cap_ver = 1
