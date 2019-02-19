@@ -55,7 +55,15 @@ class Robot:
 
     def move(self):
         self.check_collition()
-        if self.left_wheel_velocity != self.right_wheel_velocity:
+        
+        if self.check_collition() == True:
+			
+            self.position[0] = self.position[0] + self.velocity_hor
+            self.position[1] = self.position[1] + self.velocity_ver
+			
+		##changed if to elif	
+        elif self.left_wheel_velocity != self.right_wheel_velocity:
+        # if self.left_wheel_velocity != self.right_wheel_velocity:
             # Calculate ω - angular velocity and change rotation of the robot
             angular_velocity = (self.left_wheel_velocity - self.right_wheel_velocity) / self.diameter
 
@@ -148,12 +156,38 @@ class Robot:
                         self.sensors_coords[sensor, 3] = intersection_coord[1]
 
     def check_collition(self):
+        count_collisions = 0
+        self.cap_hor = 1
+        self.cap_ver = 1
         for wall in self.walls:
             if self.robot_rect.colliderect(wall):
-                # TODO When you hit the wall stop all motors. This is wrong
+                count_collisions += 1
+                # pass
+				
+				# TODO When you hit the wall stop all motors. This is wrong
                 # This is where the collition handling will take place meaning.
                 # When you hit the wall break the velocity to Vx and Vy. One of the two is perpendicular to the wall
                 # so it doesn't contribute to the movement of the robot. The other one will move the robot parallel
                 # to the wall. That's what we need to do.
-                pass
+                
                 # self.stop_motors()
+				
+                self.velocity_hor = np.cos(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity)/2
+                self.velocity_ver = np.sin(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity)/2
+                
+                if wall.width > 5:
+                    # self.velocity_ver = 0
+                    self.cap_ver = 0	
+                if wall.height >5:
+                    # self.velocity_hor = 0
+                    self.cap_hor = 0
+                    
+                self.velocity_hor = self.velocity_hor * self.cap_hor
+                self.velocity_ver = self.velocity_ver * self.cap_ver
+                    
+        if count_collisions > 0: 
+            return True
+                
+              
+                    
+                
