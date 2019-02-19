@@ -1,4 +1,5 @@
 import numpy as np
+from math import hypot as hyp
 
 
 class Robot:
@@ -38,6 +39,9 @@ class Robot:
             # sensor tips coords
             self.sensors_coords[count, 2] = self.position[0] + self.sens_radius * np.cos(self.theta + np.radians(angle))
             self.sensors_coords[count, 3] = self.position[1] + self.sens_radius * np.sin(self.theta + np.radians(angle))
+
+            self.sensors_values[count] = hyp(self.sensors_coords[count, 2] - self.sensors_coords[count, 0],
+                                             self.sensors_coords[count, 3] - self.sensors_coords[count, 1])
 
             # sensors functions parameters
             # slope a
@@ -111,7 +115,7 @@ class Robot:
         # 12 sensors perimetrically, 30o degrees between them
         # sensor 0 is the one in front of the robot.
         # Values go from 0 to 200, 200 being out of reach
-        self.sensors_values = [200 for i in range(12)]
+        self.sensors_values = [0 for i in range(12)]
         self.sensors_coords = np.zeros((12, 4))
         # self.sens_radius = 3 * self.radius
         self.sens_radius = 100
