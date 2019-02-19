@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position):
         # Robot specifications
@@ -123,47 +124,24 @@ class Robot:
         for sensor in range(len(self.sensors_rects)):
             for wall in range(len(self.walls)):
                 if self.sensors_rects[sensor].colliderect(self.walls[wall]):
-                    # intersection_coordinates = [self.sensors_coords[sensor, 2], self.sensors_coords[sensor, 3]]
-                    #
-                    # print(intersection_coordinates)
-
-                    # Check if the wall is horizontal or vertical (x,y,width,height)
-                    # if self.walls[wall][3] == 3:
-                    #     # print("Wall is horizontal")
-                    #     intersection_coord = [
-                    #         (self.walls[wall][1] - self.sensors_parameters[sensor, 1]) / self.sensors_parameters[
-                    #             sensor, 0], self.walls[wall][1]]
-                    #     # print(intersection_coord)
-                    # elif self.walls[wall][2] == 3:
-                    #     print("Wall is vertical")
-                    #     intersection_coord = [
-                    #         (self.walls[wall][1] - self.sensors_parameters[sensor, 1]) / self.sensors_parameters[
-                    #             sensor, 0], self.walls[wall][1]]
-
-                    # a = np.array([[self.sensors_parameters[sensor, 0], -1],
-                    #              [self.walls_parameters[wall, 0], -1]])
-                    #
-                    # b = np.array([-self.sensors_parameters[sensor, 1], -self.walls_parameters[wall, 1]])
-
-
                     wall_params = self.walls_parameters[wall]
                     sensor_params = self.sensors_parameters[sensor]
                     a = np.array([[wall_params[0], 1], [sensor_params[0], 1]])
                     b = np.array([wall_params[1], sensor_params[1]])
 
-                    intersection_coord = np.linalg.solve(a, b)
-                    intersection_coord[0] = -intersection_coord[0]
+                    if wall_params[0] != float('inf'):
+                        intersection_coord = np.linalg.solve(a, b)
+                        intersection_coord[0] = -intersection_coord[0]
+                    else:
+                        intersection_coord = [self.walls[wall][0], sensor_params[0] * self.walls[wall][0] + sensor_params[1]]
 
-                    self.sensors_coords[sensor, 2] = intersection_coord[0]
-                    self.sensors_coords[sensor, 3] = intersection_coord[1]
+                    self.sensors_values[sensor] = np.sqrt(
+                        (intersection_coord[0] - self.sensors_coords[sensor, 0]) ** 2 + (
+                                intersection_coord[1] - self.sensors_coords[sensor, 1]) ** 2)
 
-
-                    if sensor == 0:
-                        print("POINT: ", intersection_coord)
-                        self.sensors_values[sensor] = np.sqrt(
-                            (intersection_coord[0] - self.sensors_coords[0, 0]) ** 2 + (
-                                        intersection_coord[1] - self.sensors_coords[0, 1]) ** 2)
-                        print("sensor ", sensor, "=  ", self.sensors_values[sensor])
+                    if self.sensors_values[sensor] < 75:
+                        self.sensors_coords[sensor, 2] = intersection_coord[0]
+                        self.sensors_coords[sensor, 3] = intersection_coord[1]
 
     def check_collition(self):
         for wall in self.walls:

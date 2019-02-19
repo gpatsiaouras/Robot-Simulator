@@ -132,6 +132,12 @@ class Environment:
                              [int(self.robot.position[0] + end_x), int(self.robot.position[1] + end_y)],
                              3)
 
+            for sensor in range(len(self.robot.sensors_values)):
+                osd_sensor_text = str(self.robot.sensors_values[sensor])
+                osd_sensor = self.myfont.render(osd_sensor_text, False, (0, 255, 0))
+                self.gameDisplay.blit(osd_sensor,
+                                      (self.robot.sensors_coords[sensor, 2], self.robot.sensors_coords[sensor, 3]))
+
             # check if sensor list is not empty
             if len(self.robot.sensors_coords) != 0:
                 updated_sensors = []
