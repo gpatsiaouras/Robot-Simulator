@@ -118,7 +118,7 @@ class Robot:
         self.sensors_values = [0 for i in range(12)]
         self.sensors_coords = np.zeros((12, 4))
         # self.sens_radius = 3 * self.radius
-        self.sens_radius = 100
+        self.sens_radius = 125
 
     def setObst(self, walls, walls_params):
         self.walls = walls
@@ -143,7 +143,7 @@ class Robot:
                         (intersection_coord[0] - self.sensors_coords[sensor, 0]) ** 2 + (
                                 intersection_coord[1] - self.sensors_coords[sensor, 1]) ** 2)
 
-                    if self.sensors_values[sensor] < 75:
+                    if self.sensors_values[sensor] < 100:
                         self.sensors_coords[sensor, 2] = intersection_coord[0]
                         self.sensors_coords[sensor, 3] = intersection_coord[1]
 

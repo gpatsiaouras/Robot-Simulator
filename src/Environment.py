@@ -33,9 +33,11 @@ class Environment:
 
         # obstacle coordinates, handy for wall collision
         self.obstacles_coord = np.zeros((3, 4))
+        # self.obstacles_coord = np.zeros((4, 4))
 
         # obstacles parameters, handy for sensor values
-        self.obstacles_parameters = np.zeros((3,2))
+        self.obstacles_parameters = np.zeros((3, 2))
+        # self.obstacles_parameters = np.zeros((4, 2))
 
         pygame.init()
         pygame.font.init()
@@ -58,9 +60,9 @@ class Environment:
         self.obstacles_coord[0, 3] = self.height / 3
 
         # wall 2 origin x,y and ending x, y
-        self.obstacles_coord[1, 0] = self.width / 4 * 3
+        self.obstacles_coord[1, 0] = self.width / 8 * 7
         self.obstacles_coord[1, 1] = 0
-        self.obstacles_coord[1, 2] = self.width / 4 * 3
+        self.obstacles_coord[1, 2] = self.width / 8 * 7
         self.obstacles_coord[1, 3] = self.wall_lenght
 
         # wall 3 origin x,y and ending x, y
@@ -69,13 +71,19 @@ class Environment:
         self.obstacles_coord[2, 2] = (self.width / 4) + self.wall_lenght
         self.obstacles_coord[2, 3] = (self.height / 6) * 5
 
+        # # wall 4 origin x,y and ending x, y
+        # self.obstacles_coord[3, 0] = self.wall_lenght
+        # self.obstacles_coord[3, 1] = 0
+        # self.obstacles_coord[3, 2] = self.width / 8 * 7
+        # self.obstacles_coord[3, 3] = 100
+
         # obstacles parameters
         count = 0
         for obst in self.obstacles_coord:
             # sensors functions parameters
             # slope m
             self.obstacles_parameters[count, 0] = (self.obstacles_coord[count, 3] - self.obstacles_coord[count, 1]) / \
-                                                (self.obstacles_coord[count, 2] - self.obstacles_coord[count, 0])
+                                                  (self.obstacles_coord[count, 2] - self.obstacles_coord[count, 0])
             # intercept q
             self.obstacles_parameters[count, 1] = self.obstacles_coord[count, 1] - (
                     self.obstacles_parameters[count, 0] * self.obstacles_coord[count, 0])
@@ -93,14 +101,21 @@ class Environment:
                                  (self.obstacles_coord[2, 2], self.obstacles_coord[2, 3]), 3)
         self.obstacles.append(wall3)
 
+        # wall4 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[3, 0], self.obstacles_coord[3, 1]),
+        #                          (self.obstacles_coord[3, 2], self.obstacles_coord[3, 3]), 3)
+        # self.obstacles.append(wall4)
+
+
     # TODO Created this one that ONLY redraws the lines.
     def redraw_obstracles(self):
-        pygame.draw.line(self.gameDisplay, self.BLACK, (0, self.height / 3),
-                         (self.wall_lenght, self.height / 3), 3)
-        pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4 * 3, 0),
-                         (self.width / 4 * 3, self.wall_lenght), 3)
-        pygame.draw.line(self.gameDisplay, self.BLACK, (self.width / 4, (self.height / 6) * 5),
-                         ((self.width / 4) + self.wall_lenght, (self.height / 6) * 5), 3)
+        pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[0, 0], self.obstacles_coord[0, 1]),
+                         (self.obstacles_coord[0, 2], self.obstacles_coord[0, 3]), 3)
+        pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[1, 0], self.obstacles_coord[1, 1]),
+                         (self.obstacles_coord[1, 2], self.obstacles_coord[1, 3]), 3)
+        pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[2, 0], self.obstacles_coord[2, 1]),
+                         (self.obstacles_coord[2, 2], self.obstacles_coord[2, 3]), 3)
+        # pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[3, 0], self.obstacles_coord[3, 1]),
+        #                  (self.obstacles_coord[3, 2], self.obstacles_coord[3, 3]), 3)
 
     def render(self):
 
@@ -123,10 +138,11 @@ class Environment:
             self.gameDisplay.blit(osd_3, (0, self.height - 40))
             self.gameDisplay.blit(osd_4, (0, self.height - 20))
 
-            self.robot.robot_rect = pygame.draw.circle(self.gameDisplay, self.BLACK, [int(self.robot.position[0]), int(self.robot.position[1])],
-                               self.robot.radius, 3)
-            end_x = self.robot.diameter * np.cos(2 * np.pi + self.robot.theta)
-            end_y = self.robot.diameter * np.sin(2 * np.pi + self.robot.theta)
+            self.robot.robot_rect = pygame.draw.circle(self.gameDisplay, self.BLACK,
+                                                       [int(self.robot.position[0]), int(self.robot.position[1])],
+                                                       self.robot.radius, 3)
+            end_x = self.robot.radius * np.cos(2 * np.pi + self.robot.theta)
+            end_y = self.robot.radius * np.sin(2 * np.pi + self.robot.theta)
             pygame.draw.line(self.gameDisplay, self.BLACK,
                              [int(self.robot.position[0]), int(self.robot.position[1])],
                              [int(self.robot.position[0] + end_x), int(self.robot.position[1] + end_y)],
