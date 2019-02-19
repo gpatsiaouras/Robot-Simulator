@@ -83,19 +83,45 @@ class Robot:
             self.position[0] = self.position[0] + (self.right_wheel_velocity * np.cos(self.theta))
             self.position[1] = self.position[1] + (self.right_wheel_velocity * np.sin(self.theta))
 
-        # Check if the move caused a collision
+        # Remove the pygame rectangle object so that the check collision can evaluate with the new position
+        self.robot_rect.move_ip(self.position[0] - old_position[0], self.position[1] - old_position[1])
+
+        # Check if the new move caused a collision
         if self.check_collision():
             # Undo the move
             self.position = old_position
-            # Move according to collition handling algorithm
+            # Move according to collision handling algorithm
             self.move_with_wall()
+            # Try to move normally again
 
         # update sensors
         self.update_sensor_values()
 
     def move_with_wall(self):
-        self.position[0] = self.position[0] + self.velocity_hor
-        self.position[1] = self.position[1] + self.velocity_ver
+
+        cap_hor = 1
+        cap_ver = 1
+
+        velocity_hor = 0
+        velocity_ver = 0
+
+        for wall in self.walls:
+            if self.robot_rect.colliderect(wall):
+                velocity_hor = np.cos(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity) / 2
+                velocity_ver = np.sin(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity) / 2
+
+                if wall.width > 5:
+                    # self.velocity_ver = 0
+                    cap_ver = 0
+                if wall.height > 5:
+                    # self.velocity_hor = 0
+                    cap_hor = 0
+
+                velocity_hor = velocity_hor * cap_hor
+                velocity_ver = velocity_ver * cap_ver
+
+        self.position[0] = self.position[0] + velocity_hor
+        self.position[1] = self.position[1] + velocity_ver
 
     def increment_left_wheel(self):
         if self.left_wheel_velocity + 1 <= self.MAX_SPEED:
@@ -164,33 +190,8 @@ class Robot:
 
     def check_collision(self):
         count_collisions = 0
-        self.cap_hor = 1
-        self.cap_ver = 1
         for wall in self.walls:
             if self.robot_rect.colliderect(wall):
                 count_collisions += 1
-                # pass
-
-                # TODO When you hit the wall stop all motors. This is wrong
-                # This is where the collition handling will take place meaning.
-                # When you hit the wall break the velocity to Vx and Vy. One of the two is perpendicular to the wall
-                # so it doesn't contribute to the movement of the robot. The other one will move the robot parallel
-                # to the wall. That's what we need to do.
-
-                # self.stop_motors()
-
-                self.velocity_hor = np.cos(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity) / 2
-                self.velocity_ver = np.sin(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity) / 2
-
-                if wall.width > 5:
-                    # self.velocity_ver = 0
-                    self.cap_ver = 0
-                if wall.height > 5:
-                    # self.velocity_hor = 0
-                    self.cap_hor = 0
-
-                self.velocity_hor = self.velocity_hor * self.cap_hor
-                self.velocity_ver = self.velocity_ver * self.cap_ver
-
         if count_collisions > 0:
             return True
