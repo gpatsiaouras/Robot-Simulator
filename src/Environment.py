@@ -74,8 +74,8 @@ class Environment:
         for obst in self.obstacles_coord:
             # sensors functions parameters
             # slope m
-            self.obstacles_parameters[count, 0] = (self.obstacles_coord[count, 2] - self.obstacles_coord[count, 3]) / \
-                                                (self.obstacles_coord[count, 0] - self.obstacles_coord[count, 1])
+            self.obstacles_parameters[count, 0] = (self.obstacles_coord[count, 3] - self.obstacles_coord[count, 1]) / \
+                                                (self.obstacles_coord[count, 2] - self.obstacles_coord[count, 0])
             # intercept q
             self.obstacles_parameters[count, 1] = self.obstacles_coord[count, 1] - (
                     self.obstacles_parameters[count, 0] * self.obstacles_coord[count, 0])
