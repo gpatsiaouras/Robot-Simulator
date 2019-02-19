@@ -1,11 +1,12 @@
 import numpy as np
+from math import hypot as hyp
 
 
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position):
         # Robot specifications
         self.diameter = diameter
-        self.radius = diameter / 2
+        self.radius = int(diameter / 2)
         self.position = initial_position
 
         # Rotation is in rads
@@ -41,7 +42,7 @@ class Robot:
 
             # sensors functions parameters
             # slope a
-            self.sensors_parameters[count, 0] = (self.sensors_coords[count, 3] - self.sensors_coords[count, 2]) / \
+            self.sensors_parameters[count, 0] = (-self.sensors_coords[count, 3] + self.sensors_coords[count, 2]) / \
                                                 (self.sensors_coords[count, 1] - self.sensors_coords[count, 0])
             # intercept b
             self.sensors_parameters[count, 1] = self.sensors_coords[count, 1] - (
@@ -114,7 +115,7 @@ class Robot:
         self.sensors_values = [200 for i in range(12)]
         self.sensors_coords = np.zeros((12, 4))
         # self.sens_radius = 3 * self.radius
-        self.sens_radius = 200
+        self.sens_radius = 100
 
     def setObst(self, walls, walls_params):
         self.walls = walls
@@ -124,14 +125,37 @@ class Robot:
         for sensor in range(len(self.sensors_rects)):
             for wall in range(len(self.walls)):
                 if self.sensors_rects[sensor].colliderect(self.walls[wall]):
-                    pass
+                    intersection_coordinates = [self.sensors_coords[sensor, 2], self.sensors_coords[sensor, 3]]
+
+                    print(intersection_coordinates)
+
+                    # Check if the wall is horizontal or vertical (x,y,width,height)
+                    # if self.walls[wall][3] == 3:
+                    #     print("Wall is horizontal")
+                    #     intersection_coord = [(self.walls[wall][1] - self.sensors_parameters[sensor, 1]) / self.sensors_parameters[sensor, 0], self.walls[wall][1]]
+                    #     print(intersection_coord)
+                    # elif self.walls[wall][2] == 3:
+                    #     print("Wall is vertical")
+
+
+                    # a = np.array([[self.sensors_parameters[sensor, 0], -1],
+                    #              [self.walls_parameters[wall, 0], -1]])
+                    #
+                    # b = np.array([-self.sensors_parameters[sensor, 1], -self.walls_parameters[wall, 1]])
+                    #
+                    # intersection_coord = np.linalg.solve(a, b)
+                    # print(intersection_coord)
+                    # self.sensors_coords[sensor, 2] = intersection_coord[0]
+                    # self.sensors_coords[sensor, 3] = intersection_coord[1]
+
+                    # pass
                     # wall_params = self.walls_parameters[wall]
                     # sensor_params = self.sensors_parameters[sensor]
                     # a = np.array([[-wall_params[0], 1], [sensor_params[0], 1]])
                     # b = np.array([wall_params[1], sensor_params[1]])
                     #
                     # intersection_coord = np.linalg.solve(a, b)
-                    #
+                    # print(intersection_coord)
                     # self.sensors_values[sensor] = np.sqrt((intersection_coord[0] - self.sensors_coords[0, 0])**2 + (intersection_coord[1] - self.sensors_coords[0, 1])**2)
                     # print("sensor ", sensor, "=  ", self.sensors_values[sensor])
 
@@ -143,4 +167,5 @@ class Robot:
                 # When you hit the wall break the velocity to Vx and Vy. One of the two is perpendicular to the wall
                 # so it doesn't contribute to the movement of the robot. The other one will move the robot parallel
                 # to the wall. That's what we need to do.
-                self.stop_motors()
+                pass
+                # self.stop_motors()
