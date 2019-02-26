@@ -8,7 +8,7 @@ ROBOT_DIAMETER = 50
 
 robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
 env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, None, robot)
-robot.setObst(env.obstacles, env.obstacles_parameters)
+robot.setObst(env.obstacles_rects, env.obstacles_parameters)
 
 gameExit = False
 env.render()
