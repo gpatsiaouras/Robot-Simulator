@@ -97,7 +97,7 @@ class Environment:
                 self.obstacles_parameters[count][1] = self.obstacles_coord[count][1] - (
                         self.obstacles_parameters[count][0] * self.obstacles_coord[count][0])
             except ZeroDivisionError:
-
+                pass
 
             # draw current wall and store Rect object
             curr_wall = pygame.draw.line(self.gameDisplay, self.BLACK,
