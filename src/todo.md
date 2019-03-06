@@ -11,5 +11,6 @@
 * Create EA to evolve the weights of RNN
     * ???
 * Design rooms (use lines or surfaces?) for experiments
+* Smooth value of distance exponentially, so that only really close things matter
 * #####START REPORT
     

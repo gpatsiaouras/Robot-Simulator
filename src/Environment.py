@@ -66,10 +66,16 @@ class Environment:
         self.obstacles_coord[1, 3] = self.wall_lenght
 
         # wall 3 origin x,y and ending x, y
-        self.obstacles_coord[2, 0] = self.width / 4
-        self.obstacles_coord[2, 1] = (self.height / 6) * 5
-        self.obstacles_coord[2, 2] = (self.width / 4) + self.wall_lenght
-        self.obstacles_coord[2, 3] = (self.height / 6) * 5
+        # self.obstacles_coord[2, 0] = self.width / 4
+        # self.obstacles_coord[2, 1] = (self.height / 6) * 5
+        # self.obstacles_coord[2, 2] = (self.width / 4) + self.wall_lenght
+        # self.obstacles_coord[2, 3] = (self.height / 6) * 5
+        self.obstacles_coord[2, 0] = 0
+        self.obstacles_coord[2, 1] = 0
+        self.obstacles_coord[2, 2] = self.width
+        self.obstacles_coord[2, 3] = 0
+
+
 
         # obstacles parameters
         count = 0
