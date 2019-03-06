@@ -1,6 +1,8 @@
 import numpy as np
 from math import hypot as hyp
 
+from numpy.linalg import LinAlgError
+
 
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position):
@@ -20,9 +22,9 @@ class Robot:
 
         # Sensors
         self.sensors_values = []
-        self.init_sensors()
         self.sensors_rects = []
         self.sensors_parameters = np.zeros((12, 2))
+        self.init_sensors()
 
         # walls for sensor values
         self.walls = []
@@ -157,6 +159,7 @@ class Robot:
         self.sensors_coords = np.zeros((12, 4))
         # self.sens_radius = 3 * self.radius
         self.sens_radius = 100 + self.radius
+        self.update_sensor_values()
 
     def setObst(self, walls, walls_params):
         self.walls = walls
@@ -172,8 +175,16 @@ class Robot:
                     b = np.array([wall_params[1], sensor_params[1]])
 
                     if wall_params[0] != float('inf'):
-                        intersection_coord = np.linalg.solve(a, b)
-                        intersection_coord[0] = -intersection_coord[0]
+                        print("sensor coord: ", self.sensors_coords[sensor])
+                        print("sensor params: ", self.sensors_parameters[sensor])
+                        print("wall params: ", self.walls_parameters[wall])
+                        try:
+                            intersection_coord = np.linalg.solve(a, b)
+                            intersection_coord[0] = -intersection_coord[0]
+                        except LinAlgError:
+                            print("no collision between wall ", wall, " and sensor ", sensor)
+                            return
+
                     else:
                         intersection_coord = [self.walls[wall][0],
                                               sensor_params[0] * self.walls[wall][0] + sensor_params[1]]

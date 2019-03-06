@@ -7,6 +7,7 @@ class Environment:
     WHITE = (255, 255, 255)
     GREEN = (0, 255, 0)
     ROBOT_DIAMETER = 50
+    PADDING = 50
 
     def __init__(self, width=800, height=800, obstacles=None, robot=None):
         """
@@ -22,6 +23,7 @@ class Environment:
 
         # initialize matrix with zeros representing the map
         self.grid = np.zeros((self.height, self.width))
+        # self.map = pygame.Surface([self.height + self.PADDING, self.width + self.PADDING])
         self.map = pygame.Surface([self.height, self.width])
         self.map.fill((255, 255, 255))
         self.rect = self.map.get_rect()
@@ -47,10 +49,10 @@ class Environment:
 
         # If no coordinates are passed, initialize empty room (with border walls)
         if self.obstacles_coord is None:
-            self.obstacles_coord = [[0, 0, self.width, 0],
-                                    [self.width, 0, self.width, self.height],
-                                    [self.width, self.height, 0, self.height],
-                                    [0, self.height, 0, 0]
+            self.obstacles_coord = [[0 + self.PADDING, 0 + self.PADDING, self.width - self.PADDING, 0 + self.PADDING],
+                                    [self.width - self.PADDING, 0 + self.PADDING, self.width - self.PADDING, self.height - self.PADDING],
+                                    [self.width - self.PADDING, self.height - self.PADDING, 0 + self.PADDING, self.height - self.PADDING],
+                                    [0 + self.PADDING, self.height - self.PADDING, 0 + self.PADDING, 0 + self.PADDING]
                                     ]
 
         # obstacles parameters, handy for sensor values
@@ -60,28 +62,6 @@ class Environment:
         self.add_obstacles()
 
     def add_obstacles(self):
-
-        # ASSIGNMENT 2 ROOM
-        # self.wall_lenght = (self.height / 4) * 3 if self.height < self.width else (self.width / 4) * 3
-        # self.wall_thickness = 3
-        #
-        # # wall 1 origin x,y and ending x, y
-        # self.obstacles_coord[0, 0] = 0
-        # self.obstacles_coord[0, 1] = self.height / 3
-        # self.obstacles_coord[0, 2] = self.wall_lenght
-        # self.obstacles_coord[0, 3] = self.height / 3
-        #
-        # # wall 2 origin x,y and ending x, y
-        # self.obstacles_coord[1, 0] = self.width / 8 * 7
-        # self.obstacles_coord[1, 1] = 0
-        # self.obstacles_coord[1, 2] = self.width / 8 * 7
-        # self.obstacles_coord[1, 3] = self.wall_lenght
-        #
-        # # wall 3 origin x,y and ending x, y
-        # self.obstacles_coord[2, 0] = self.width / 4
-        # self.obstacles_coord[2, 1] = (self.height / 6) * 5
-        # self.obstacles_coord[2, 2] = (self.width / 4) + self.wall_lenght
-        # self.obstacles_coord[2, 3] = (self.height / 6) * 5
 
         # for counter, obst in enumerate(self.obstacles_rects):
 
@@ -102,7 +82,7 @@ class Environment:
             # draw current wall and store Rect object
             curr_wall = pygame.draw.line(self.gameDisplay, self.BLACK,
                                          (self.obstacles_coord[count][0], self.obstacles_coord[count][1]),
-                                         (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 3)
+                                         (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 5)
             self.obstacles_rects.append(curr_wall)
 
         # wall1 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[0, 0], self.obstacles_coord[0, 1]),
