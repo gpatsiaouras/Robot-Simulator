@@ -50,8 +50,10 @@ class Environment:
         # If no coordinates are passed, initialize empty room (with border walls)
         if self.obstacles_coord is None:
             self.obstacles_coord = [[0 + self.PADDING, 0 + self.PADDING, self.width - self.PADDING, 0 + self.PADDING],
-                                    [self.width - self.PADDING, 0 + self.PADDING, self.width - self.PADDING, self.height - self.PADDING],
-                                    [self.width - self.PADDING, self.height - self.PADDING, 0 + self.PADDING, self.height - self.PADDING],
+                                    [self.width - self.PADDING, 0 + self.PADDING, self.width - self.PADDING,
+                                     self.height - self.PADDING],
+                                    [self.width - self.PADDING, self.height - self.PADDING, 0 + self.PADDING,
+                                     self.height - self.PADDING],
                                     [0 + self.PADDING, self.height - self.PADDING, 0 + self.PADDING, 0 + self.PADDING]
                                     ]
 
@@ -70,14 +72,19 @@ class Environment:
             # sensors functions parameters
 
             # slope m
-            try:
-                self.obstacles_parameters[count][0] = (self.obstacles_coord[count][3] - self.obstacles_coord[count][1]) / (
-                        (self.obstacles_coord[count][2] - self.obstacles_coord[count][0]))
-                # intercept q
-                self.obstacles_parameters[count][1] = self.obstacles_coord[count][1] - (
-                        self.obstacles_parameters[count][0] * self.obstacles_coord[count][0])
-            except ZeroDivisionError:
-                pass
+            if self.obstacles_coord[count][3] - self.obstacles_coord[count][1] == 0:
+                    self.obstacles_parameters[count][0] = 0
+            else:
+                if self.obstacles_coord[count][2] - self.obstacles_coord[count][0] == 0:
+                        self.obstacles_parameters[count][0] = float('inf')
+                else:
+                    self.obstacles_parameters[count][0] = (self.obstacles_coord[count][3] - self.obstacles_coord[count][
+                        1]) / ((self.obstacles_coord[count][2] -
+                                self.obstacles_coord[count][0]))
+
+            # intercept q
+            self.obstacles_parameters[count][1] = self.obstacles_coord[count][1] - (
+                    self.obstacles_parameters[count][0] * self.obstacles_coord[count][0])
 
             # draw current wall and store Rect object
             curr_wall = pygame.draw.line(self.gameDisplay, self.BLACK,
@@ -85,17 +92,9 @@ class Environment:
                                          (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 5)
             self.obstacles_rects.append(curr_wall)
 
-        # wall1 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[0, 0], self.obstacles_coord[0, 1]),
-        #                          (self.obstacles_coord[0, 2], self.obstacles_coord[0, 3]), 3)
-        # self.obstacles_rects.append(wall1)
-        #
-        # wall2 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[1, 0], self.obstacles_coord[1, 1]),
-        #                          (self.obstacles_coord[1, 2], self.obstacles_coord[1, 3]), 3)
-        # self.obstacles_rects.append(wall2)
-        #
-        # wall3 = pygame.draw.line(self.gameDisplay, self.BLACK, (self.obstacles_coord[2, 0], self.obstacles_coord[2, 1]),
-        #                          (self.obstacles_coord[2, 2], self.obstacles_coord[2, 3]), 3)
-        # self.obstacles_rects.append(wall3)
+            print("############################ INIT WALLS COORD + PARAMS ############################")
+            print(self.obstacles_coord)
+            print(self.obstacles_parameters)
 
     def redraw_obstacles(self):
         for count, obst in enumerate(self.obstacles_coord):
