@@ -175,14 +175,14 @@ class Robot:
                     b = np.array([wall_params[1], sensor_params[1]])
 
                     if wall_params[0] != float('inf'):
-                        print("sensor coord: ", self.sensors_coords[sensor])
-                        print("sensor params: ", self.sensors_parameters[sensor])
-                        print("wall params: ", self.walls_parameters[wall])
+                        # print("sensor coord: ", self.sensors_coords[sensor])
+                        # print("sensor params: ", self.sensors_parameters[sensor])
+                        # print("wall params: ", self.walls_parameters[wall])
                         try:
                             intersection_coord = np.linalg.solve(a, b)
                             intersection_coord[0] = -intersection_coord[0]
                         except LinAlgError:
-                            print("no collision between wall ", wall, " and sensor ", sensor)
+                            # print("no collision between wall ", wall, " and sensor ", sensor)
                             return
 
                     else:
