@@ -5,10 +5,33 @@ import pygame
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 ROBOT_DIAMETER = 50
+PADDING = 10
+CENTER_W = SCREEN_WIDTH / 2
+CENTER_H = SCREEN_HEIGHT / 2
+
+empty_room = [[0 + PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING, 0 + PADDING],
+                                    [SCREEN_WIDTH - PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING,
+                                     SCREEN_HEIGHT - PADDING],
+                                    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING, 0 + PADDING,
+                                     SCREEN_HEIGHT - PADDING],
+                                    [0 + PADDING, SCREEN_HEIGHT - PADDING, 0 + PADDING, 0 + PADDING]
+                                    ]
+
+room_1 = [[0 + PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING, 0 + PADDING],
+                                    [SCREEN_WIDTH - PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING,
+                                     SCREEN_HEIGHT - PADDING],
+                                    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING, 0 + PADDING,
+                                     SCREEN_HEIGHT - PADDING],
+                                    [0 + PADDING, SCREEN_HEIGHT - PADDING, 0 + PADDING, 0 + PADDING],
+                                    [CENTER_W - 100, CENTER_H - 100, CENTER_W + 100, CENTER_H - 100],
+                                    [CENTER_W + 100, CENTER_H - 100, CENTER_W + 100, CENTER_H + 100],
+                                    [CENTER_W + 100, CENTER_H + 100, CENTER_W - 100, CENTER_H + 100],
+                                    [CENTER_W - 100, CENTER_H + 100, CENTER_W - 100, CENTER_H - 100]]
 
 robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
-env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, None, robot)
-robot.setObst(env.obstacles, env.obstacles_parameters)
+# env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, None, robot)
+env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, room_1, robot)
+robot.setObst(env.obstacles_rects, env.obstacles_parameters)
 
 gameExit = False
 env.render()
