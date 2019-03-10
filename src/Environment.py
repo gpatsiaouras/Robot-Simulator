@@ -41,7 +41,9 @@ class Environment:
         self.dust_dots_intensity = 4
         self.dust_matrix_width = int(self.width / self.dust_dots_intensity)
         self.dust_matrix_height = int(self.height / self.dust_dots_intensity)
+        self.dust_total = self.dust_matrix_width * self.dust_matrix_height
         self.dust_matrix, self.dust_point = self.initialize_dust()
+        self.dust_coverage = 1  # 100% dust coverage when we start
 
         # OBSTACLES
 
@@ -111,6 +113,18 @@ class Environment:
     def reset_background(self):
         # Draw everything white
         self.gameDisplay.fill(self.WHITE)
+
+    def calculate_dust_coverage(self):
+        # TODO Could be faster if we did in the same function that we draw the dust
+        # because when we draw the dust we actually know if a dust point became 0 so we can
+        # just decrement it and then we wont have to do this double for.
+        dust_on_screen = 0
+        for i in range(self.dust_matrix_width):
+            for j in range(self.dust_matrix_height):
+                if self.dust_matrix[i][j] != 0:
+                    dust_on_screen += 1
+
+        self.dust_coverage = dust_on_screen / self.dust_total
 
     def draw_dust(self):
         for i in range(self.dust_matrix_width):
@@ -189,3 +203,6 @@ class Environment:
         self.draw_osd()
         self.draw_obstacles()
         self.draw_sensors()
+
+        # Calculate Dust coverage (needed or Evolutionary Algorithm)
+        self.calculate_dust_coverage()
