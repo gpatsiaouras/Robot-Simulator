@@ -30,6 +30,9 @@ class Robot:
         self.walls = []
         self.walls_parameters = np.zeros((4, 2))
 
+        # Collision Data (for evolution algorithm)
+        self.collisions = 0
+
         self.robot_rect = None
 
     def update_sensor_values(self):
@@ -95,6 +98,8 @@ class Robot:
             self.position = old_position
             # Move according to collision handling algorithm
             self.move_with_wall()
+            # Increment collisions counter
+            self.collisions += 1
 
         # update sensors
         self.update_sensor_values()
