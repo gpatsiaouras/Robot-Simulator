@@ -4,12 +4,12 @@ from main import Simulator
 
 # Fitness Formula Parameters
 COLLISION_PENALTY = -0.5
-COLLISION_WEIGHT = 0.7
-DUST_MULTIPLIER = 100
-DUST_WEIGHT = 0.3
+COLLISION_WEIGHT = 0.3
+GROUND_MULTIPLIER = 100
+GROUND_WEIGHT = 0.7
 
 # Evolutionary Algorithm
-NUMBER_OF_PARENTS_MATING = 2
+NUMBER_OF_PARENTS_MATING = 4
 
 
 class EvolutionaryAlgorithm:
@@ -44,11 +44,11 @@ class EvolutionaryAlgorithm:
     def fitness(self, simulators):
         fitness = []
         for simulator in simulators:
-            dust_coverage = simulator.env.dust_coverage
+            ground_coverage = simulator.env.ground_coverage
             collisions = simulator.robot.collisions
 
-            fitness_formula = (DUST_WEIGHT * dust_coverage * DUST_MULTIPLIER
-                               + COLLISION_WEIGHT * collisions * COLLISION_PENALTY) / (DUST_WEIGHT + COLLISION_WEIGHT)
+            fitness_formula = (GROUND_WEIGHT * ground_coverage * GROUND_MULTIPLIER
+                               + COLLISION_WEIGHT * collisions * COLLISION_PENALTY) / (GROUND_WEIGHT + COLLISION_WEIGHT)
             fitness.append(fitness_formula)
 
         return fitness
@@ -106,7 +106,7 @@ class EvolutionaryAlgorithm:
 
             # Take the fitness of each chromosome in the population
             fitness = self.fitness(simulators)
-
+            print(fitness)
             # Select the best parents in the population
             parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
 
@@ -119,8 +119,6 @@ class EvolutionaryAlgorithm:
 
             population[0:parents.shape[0], :] = parents
             population[parents.shape[0]:, :] = mutation
-
-            print(fitness)
 
     def crossover2(self, robots_selected):
         # assuming this list is always even...
@@ -206,6 +204,6 @@ class EvolutionaryAlgorithm:
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=5, robots_per_generation=4,
-                                                   exploration_steps=100)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=10, robots_per_generation=10,
+                                                   exploration_steps=200)
     evolutionary_algorithm.evolve()

@@ -44,6 +44,7 @@ class Environment:
         self.dust_total = self.dust_matrix_width * self.dust_matrix_height
         self.dust_matrix, self.dust_point = self.initialize_dust()
         self.dust_coverage = 1  # 100% dust coverage when we start
+        self.ground_coverage = 1 - self.dust_coverage
 
         # OBSTACLES
 
@@ -125,6 +126,7 @@ class Environment:
                     dust_on_screen += 1
 
         self.dust_coverage = dust_on_screen / self.dust_total
+        self.ground_coverage = 1 - self.dust_coverage
 
     def draw_dust(self):
         for i in range(self.dust_matrix_width):
@@ -151,14 +153,17 @@ class Environment:
         osd_text_2 = 'Left Wheel:{0}'.format(self.robot.left_wheel_velocity)
         osd_text_3 = 'Right Wheel:{0}'.format(self.robot.right_wheel_velocity)
         osd_text_4 = 'Theta:{0}'.format(self.robot.theta)
+        osd_text_5 = 'Ground Coverage:{0}'.format(self.ground_coverage)
         osd_1 = self.myfont.render(osd_text_1, False, (0, 0, 0))
         osd_2 = self.myfont.render(osd_text_2, False, (0, 0, 0))
         osd_3 = self.myfont.render(osd_text_3, False, (0, 0, 0))
         osd_4 = self.myfont.render(osd_text_4, False, (0, 0, 0))
-        self.gameDisplay.blit(osd_1, (20, self.height - 100))
-        self.gameDisplay.blit(osd_2, (20, self.height - 80))
-        self.gameDisplay.blit(osd_3, (20, self.height - 60))
-        self.gameDisplay.blit(osd_4, (20, self.height - 40))
+        osd_5 = self.myfont.render(osd_text_5, False, (0, 0, 0))
+        self.gameDisplay.blit(osd_1, (20, self.height - 120))
+        self.gameDisplay.blit(osd_2, (20, self.height - 100))
+        self.gameDisplay.blit(osd_3, (20, self.height - 80))
+        self.gameDisplay.blit(osd_4, (20, self.height - 60))
+        self.gameDisplay.blit(osd_5, (20, self.height - 40))
 
     def draw_robot(self):
         # Draw the circle of the robot

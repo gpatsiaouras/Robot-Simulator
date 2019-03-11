@@ -18,10 +18,10 @@ class ANN:
     def feed_forward(self, input):
         # in first step take as input sensors values + (that stands
         # for concatenates being vectors) + activations of previous iteration
-        middle_layer = sigmoid(np.matmul(np.append(input.T, self.prev_activation.T), self.weights1))
+        middle_layer = np.tanh(np.matmul(np.append(input.T, self.prev_activation.T), self.weights1))
         # after computing new activations store them for next iterations
         self.prev_activation = middle_layer
-        self.output_vector = sigmoid(np.dot(middle_layer, self.weights2))
+        self.output_vector = np.tanh(np.dot(middle_layer, self.weights2))
 
         return self.output_vector
 
