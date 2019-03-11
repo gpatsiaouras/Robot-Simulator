@@ -1,3 +1,4 @@
+import numpy as np
 from Environment import Environment
 from ann import ANN
 from robot import Robot
@@ -36,25 +37,29 @@ class Simulator:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-                if not self.autonomous:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_w:
-                            self.robot.increment_left_wheel()
-                        if event.key == pygame.K_s:
-                            self.robot.decrement_left_wheel()
-                        if event.key == pygame.K_o:
-                            self.robot.increment_right_wheel()
-                        if event.key == pygame.K_l:
-                            self.robot.decrement_right_wheel()
-                        if event.key == pygame.K_t:
-                            self.robot.increment_both_wheels()
-                        if event.key == pygame.K_g:
-                            self.robot.decrement_both_wheels()
-                        if event.key == pygame.K_x:
-                            self.robot.stop_motors()
-                else:
-                    self.network.feed_forward(self.robot.sensors_values)
-                    # //TODO: take the output of the feed forward functiont and use it to contorl the wheels
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_w:
+                        self.robot.increment_left_wheel()
+                    if event.key == pygame.K_s:
+                        self.robot.decrement_left_wheel()
+                    if event.key == pygame.K_o:
+                        self.robot.increment_right_wheel()
+                    if event.key == pygame.K_l:
+                        self.robot.decrement_right_wheel()
+                    if event.key == pygame.K_t:
+                        self.robot.increment_both_wheels()
+                    if event.key == pygame.K_g:
+                        self.robot.decrement_both_wheels()
+                    if event.key == pygame.K_x:
+                        self.robot.stop_motors()
+
+            if self.autonomous:
+                # Change the sensor values from a list to numpy array so that the ann can read it
+                # and make it uniform
+                sensors_as_vector = np.asarray(self.robot.sensors_values) * 0.01
+                motor_values = self.network.feed_forward(sensors_as_vector)
+                self.robot.left_wheel_velocity = motor_values[0] * 5
+                self.robot.right_wheel_velocity = motor_values[1] * 5
 
             pygame.display.update()
             self.env.clock.tick(25)
@@ -66,5 +71,7 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(rooms.room_1)
+    simulator = Simulator(rooms.room_1, autonomous=True)
+    simulator.network.weights1 = np.random.rand(17, 5)
+    simulator.network.weights2 = np.random.rand(5, 2)
     simulator.run()
