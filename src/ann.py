@@ -6,12 +6,12 @@ def sigmoid(x):
 
 
 class ANN:
-    def __init__(self, input_neurons=12, weights1=None, weights2=None, hidden_neurons=5, output_neurons=2):
+    def __init__(self, input_neurons=17, hidden_neurons=5, output_neurons=2):
         self.input_vector = input_neurons
         # initialize previous activations to zero, so that at first initialization of the network it just concatenetes zeros
         self.prev_activation = np.zeros((1, hidden_neurons))
-        self.weights1 = weights1
-        self.weights2 = weights2
+        self.weights1 = np.random.rand(17, 5)
+        self.weights2 = np.random.rand(5, 2)
         self.output_vector = np.random.rand(2, 1)
 
     def feed_forward(self, input):
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     weights2 = np.random.rand(5, 2)
 
     # Initiate Neural Network
-    ann = ANN( weights1=weights1, weights2=weights2)
+    ann = ANN()
     ann.feed_forward(input_vector)
 
     print(ann.get_output())
