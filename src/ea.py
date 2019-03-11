@@ -85,13 +85,13 @@ class EvolutionaryAlgorithm:
         # Mutation changes a single gene in each offspring randomly.
         for index in range(crossover.shape[0]):
             # Generate a random value to add to the gene
-            random_value = np.random.uniform(0.0, 5.0, 1)
+            random_value = np.random.uniform(-5.0, 5.0, 1)
             crossover[index, 4] = crossover[index, 4] + random_value
 
         return crossover
 
     def evolve(self):
-        population = np.random.uniform(low=0.0, high=5.0, size=self.population_size)
+        population = np.random.uniform(low=-5.0, high=5.0, size=self.population_size)
 
         for generation in range(self.number_of_generations):
             print("Generation {0}#".format(generation))
@@ -120,7 +120,7 @@ class EvolutionaryAlgorithm:
             population[0:parents.shape[0], :] = parents
             population[parents.shape[0]:, :] = mutation
 
-        self.printBestResult(fitness, population)
+            print(fitness)
 
     def crossover2(self, robots_selected):
         # assuming this list is always even...
@@ -200,12 +200,12 @@ class EvolutionaryAlgorithm:
         return weight_C1, weights_C2
 
     def printBestResult(self, fitness, population):
-        # TODO Implement for clarity
+        print(fitness)
         pass
 
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=1, robots_per_generation=4,
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=5, robots_per_generation=4,
                                                    exploration_steps=100)
     evolutionary_algorithm.evolve()

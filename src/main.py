@@ -58,8 +58,8 @@ class Simulator:
                 # and make it uniform
                 sensors_as_vector = np.asarray(self.robot.sensors_values) * 0.01
                 motor_values = self.network.feed_forward(sensors_as_vector)
-                self.robot.left_wheel_velocity = motor_values[0] * 5
-                self.robot.right_wheel_velocity = motor_values[1] * 5
+                self.robot.left_wheel_velocity = motor_values[0] * 10
+                self.robot.right_wheel_velocity = motor_values[1] * 10
 
             pygame.display.update()
             self.env.clock.tick(25)

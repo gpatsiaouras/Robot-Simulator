@@ -98,9 +98,9 @@ class Environment:
                                          (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 5)
             self.obstacles_rects.append(curr_wall)
 
-            print("############################ INIT WALLS COORD + PARAMS ############################")
-            print(self.obstacles_coord)
-            print(self.obstacles_parameters)
+            # print("############################ INIT WALLS COORD + PARAMS ############################")
+            # print(self.obstacles_coord)
+            # print(self.obstacles_parameters)
 
     def initialize_dust(self):
         # Zero(0) means that there is dust.
