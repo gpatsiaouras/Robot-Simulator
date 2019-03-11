@@ -8,6 +8,9 @@ COLLISION_WEIGHT = 0.7
 DUST_MULTIPLIER = 100
 DUST_WEIGHT = 0.3
 
+# Evolutionary Algorithm
+NUMBER_OF_PARENTS_MATING = 2
+
 
 class EvolutionaryAlgorithm:
     def __init__(self, number_of_generations, robots_per_generation, exploration_steps):
@@ -16,11 +19,14 @@ class EvolutionaryAlgorithm:
         self.robots_per_generation = robots_per_generation
         self.exploration_steps = exploration_steps
 
-        # Fixed Parameters
-        self.number_of_parents_mating = 4
-        self.number_of_weights = 12
+        # Fixed Parameters of the ANN
+        self.number_of_nodes_input_layer = 12
         self.number_of_nodes_hidden_layer = 5
-        self.number_of_genes = self.number_of_weights * self.number_of_nodes_hidden_layer
+        self.number_of_nodes_output_layer = 2
+
+        # Calculating the number of genes based on the layers of the RNN used to calculate the motion
+        self.number_of_genes = self.number_of_nodes_input_layer * self.number_of_nodes_hidden_layer \
+                               + self.number_of_nodes_hidden_layer * self.number_of_nodes_output_layer
 
         # Specify population size
         self.population_size = (self.robots_per_generation, self.number_of_genes)
@@ -29,8 +35,9 @@ class EvolutionaryAlgorithm:
         return np.append(weights1.flatten(), weights2.flatten())
 
     def vector_to_weights(self, vector):
-        weights_combined = np.split(vector, [self.number_of_genes,
-                                             self.number_of_genes + 10])
+        weights_combined = np.split(vector, [
+            self.number_of_genes - self.number_of_nodes_hidden_layer * self.number_of_nodes_output_layer,
+            self.number_of_genes])
         return weights_combined[0], weights_combined[1]
 
     def fitness(self, simulators):
@@ -46,9 +53,9 @@ class EvolutionaryAlgorithm:
         return fitness
 
     def select_mating_pool(self, population, fitness, number_of_parents_mating):
-        parents = np.empty((self.number_of_parents_mating, population.shape[1]))
+        parents = np.empty((number_of_parents_mating, population.shape[1]))
 
-        for parent_number in range(self.number_of_parents_mating):
+        for parent_number in range(number_of_parents_mating):
             index_of_max_fitness = np.where(fitness == np.max(fitness))
             index_of_max_fitness = index_of_max_fitness[0][0]
             parents[parent_number, :] = population[index_of_max_fitness, :]
@@ -83,7 +90,7 @@ class EvolutionaryAlgorithm:
         return crossover
 
     def evolve(self):
-        population = np.random.uniform(low=0.0, high=1.0, size=self.population_size)
+        population = np.random.uniform(low=0.0, high=5.0, size=self.population_size)
 
         for generation in range(self.number_of_generations):
             print("Generation {0}#".format(generation))
@@ -101,7 +108,7 @@ class EvolutionaryAlgorithm:
             fitness = self.fitness(simulators)
 
             # Select the best parents in the population
-            parents = self.select_mating_pool(population, fitness, self.number_of_parents_mating)
+            parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
 
             # Generate the next generation using crossover
             offspring_shape = (self.population_size[0] - parents.shape[0], self.number_of_genes)
@@ -116,12 +123,12 @@ class EvolutionaryAlgorithm:
         self.printBestResult(fitness, population)
 
     def printBestResult(self, fitness, population):
-        #TODO Implement for clarity
+        # TODO Implement for clarity
         pass
 
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=1, robots_per_generation=2,
-                                                   exploration_steps=200)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=1, robots_per_generation=4,
+                                                   exploration_steps=100)
     evolutionary_algorithm.evolve()
