@@ -20,7 +20,7 @@ class EvolutionaryAlgorithm:
         self.exploration_steps = exploration_steps
 
         # Fixed Parameters of the ANN
-        self.number_of_nodes_input_layer = 12
+        self.number_of_nodes_input_layer = 17
         self.number_of_nodes_hidden_layer = 5
         self.number_of_nodes_output_layer = 2
 
@@ -38,7 +38,8 @@ class EvolutionaryAlgorithm:
         weights_combined = np.split(vector, [
             self.number_of_genes - self.number_of_nodes_hidden_layer * self.number_of_nodes_output_layer,
             self.number_of_genes])
-        return weights_combined[0], weights_combined[1]
+        return weights_combined[0].reshape(self.number_of_nodes_input_layer, self.number_of_nodes_hidden_layer), \
+               weights_combined[1].reshape(self.number_of_nodes_hidden_layer, self.number_of_nodes_output_layer)
 
     def fitness(self, simulators):
         fitness = []
@@ -84,7 +85,7 @@ class EvolutionaryAlgorithm:
         # Mutation changes a single gene in each offspring randomly.
         for index in range(crossover.shape[0]):
             # Generate a random value to add to the gene
-            random_value = np.random.uniform(0.0, 1.0, 1)
+            random_value = np.random.uniform(0.0, 5.0, 1)
             crossover[index, 4] = crossover[index, 4] + random_value
 
         return crossover
@@ -97,11 +98,10 @@ class EvolutionaryAlgorithm:
 
             simulators = []
             for i in range(self.robots_per_generation):
-                sim = Simulator(rooms.room_1, self.exploration_steps)
+                sim = Simulator(rooms.room_1, self.exploration_steps, autonomous=True)
+                sim.network.weights1, sim.network.weights2 = self.vector_to_weights(population[i])
+
                 simulators.append(sim)
-                # TODO Instruct the simulator to run in "Headless" mode by
-                # giving him the weights for the ann in order to move the robot
-                # for the time of the simulation
                 sim.run()
 
             # Take the fitness of each chromosome in the population
@@ -121,85 +121,82 @@ class EvolutionaryAlgorithm:
             population[parents.shape[0]:, :] = mutation
 
         self.printBestResult(fitness, population)
-        
-    def crossover2(self, robots_selected): 
-		#assuming this list is always even...
 
-		#takes all parents in
-		#should return children
-		
-		#random numbe between 0 and 1 * len list selected
-		#move this into random list... (funtion for randomly sort a list)?
-		#remove from that list
-		
-		
+    def crossover2(self, robots_selected):
+        # assuming this list is always even...
+
+        # takes all parents in
+        # should return children
+
+        # random numbe between 0 and 1 * len list selected
+        # move this into random list... (funtion for randomly sort a list)?
+        # remove from that list
+
         robtos_random = []
-		
-		#if length list is not constant, create a new variable with original length list
-        for i in range(0, robots_selected): #does length stay constant, even if loop reducing...
-            a = np.random #rundom number 0 and 1
-            index = a * robots_selected.length #this is NEW length
-            robots_random.append(robots_selected[i]) #check..
-            del robots_selected[i] #check #so that this robot is chosen only once
-			
-			
+
+        # if length list is not constant, create a new variable with original length list
+        for i in range(0, robots_selected):  # does length stay constant, even if loop reducing...
+            a = np.random  # rundom number 0 and 1
+            index = a * robots_selected.length  # this is NEW length
+            robots_random.append(robots_selected[i])  # check..
+            del robots_selected[i]  # check #so that this robot is chosen only once
+
         offspring_list = []
-		
-		#now, select in pairs and apply misture
-        for i in range(0, robots_random.length/2):
-            k = 2*i
-            offspring = mixture(robots_random(k),robots_random(k+1)) ##Here is where they mix
-            offspring_list.append(offspring) #check
-			
+
+        # now, select in pairs and apply misture
+        for i in range(0, robots_random.length / 2):
+            k = 2 * i
+            offspring = mixture(robots_random(k), robots_random(k + 1))  ##Here is where they mix
+            offspring_list.append(offspring)  # check
+
         return offspring_list
-        
-    def mixture2(parent1, parent2): #way of crossing genes..
-		
+
+    def mixture2(parent1, parent2):  # way of crossing genes..
+
         weights_A1 = a.weights1
         weights_B1 = b.weights1
-	
+
         weights_A2 = a.weights2
         weights_B2 = b.weights2
-	
-        weights_C1 = np.zeros #create new instance robot?
+
+        weights_C1 = np.zeros  # create new instance robot?
         weights_C2 = np.zeros
-		
+
         changed_matrix1 = np.zeros
         changed_matrix2 = np.zeros
-		
-		
-		#also: choose randomly x spaces --> generate vector random positions 
-        vectorx1 = [random.randint(1,weights_C1[0].length) for _ in range(number_genes/2)] ##assume even?
-        vectory1 = [random.randint(1,weights_C1.length) for _ in range(number_genes/2)]
-		
-        vectorx2 = [random.randint(1,weights_C2[0].length) for _ in range(number_genes/2)] ##assume even?
-        vectory2 = [random.randint(1,weights_C2.length) for _ in range(number_genes/2)]
-		
-		#this might repeat some...
-		
-        for i in range(0, number_genes/2): #this range needs to corrected I beleive..
+
+        # also: choose randomly x spaces --> generate vector random positions
+        vectorx1 = [random.randint(1, weights_C1[0].length) for _ in range(number_genes / 2)]  ##assume even?
+        vectory1 = [random.randint(1, weights_C1.length) for _ in range(number_genes / 2)]
+
+        vectorx2 = [random.randint(1, weights_C2[0].length) for _ in range(number_genes / 2)]  ##assume even?
+        vectory2 = [random.randint(1, weights_C2.length) for _ in range(number_genes / 2)]
+
+        # this might repeat some...
+
+        for i in range(0, number_genes / 2):  # this range needs to corrected I beleive..
             a = vectorx1[i]
             b = vectory1[i]
             weights_C1[a][b] = weights_A1[a][b]
             changed_matrix1[a][b] = 1
-		
-        for i in range(0,changed_matrix1.length):
+
+        for i in range(0, changed_matrix1.length):
             for j in range(0, changed_matrix1.length):
-                if changed_matrix1[i][j] == 0: #has not been changed, mean this is for the other parent to fill in
+                if changed_matrix1[i][j] == 0:  # has not been changed, mean this is for the other parent to fill in
                     weights_C1[i][j] = weights_B1[i][j]
 
-        #weights2 ##NEEDS TO BE ADJUSTED
-        for i in range(0, number_genes/2):
+        # weights2 ##NEEDS TO BE ADJUSTED
+        for i in range(0, number_genes / 2):
             a = vectorx2[i]
             b = vectory2[i]
             weights_C2[a][b] = weights_A2[a][b]
             changed_matrix2[a][b] = 1
-		
-        for i in range(0,changed_matrix2.length):
+
+        for i in range(0, changed_matrix2.length):
             for j in range(0, changed_matrix2.length):
-                if changed_matrix2[i][j] == 0: #has not been changed, mean this is for the other parent to fill in
+                if changed_matrix2[i][j] == 0:  # has not been changed, mean this is for the other parent to fill in
                     weights_C2[i][j] = weights_B2[i][j]
-        
+
         return weight_C1, weights_C2
 
     def printBestResult(self, fitness, population):

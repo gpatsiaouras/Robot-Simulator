@@ -9,7 +9,7 @@ class ANN:
     def __init__(self, input_neurons=17, hidden_neurons=5, output_neurons=2):
         self.input_vector = input_neurons
         # initialize previous activations to zero, so that
-        # at first initialization of the network it just concatenetes zeros
+        # at first initialization of the network it just concatenates zeros
         self.prev_activation = np.zeros((1, hidden_neurons))
         self.weights1 = np.random.rand(input_neurons, hidden_neurons)
         self.weights2 = np.random.rand(hidden_neurons, output_neurons)
