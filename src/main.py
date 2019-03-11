@@ -12,14 +12,17 @@ CENTER_H = SCREEN_HEIGHT / 2
 
 
 class Simulator:
-    def __init__(self, room):
+    def __init__(self, room, max_steps=-1):
         self.robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
         self.env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, room, self.robot)
         self.robot.setObst(self.env.obstacles_rects, self.env.obstacles_parameters)
         self.game_exit = False
+
+        self.current_step = 0
+        self.max_steps = max_steps
         self.env.render()
 
-    def game_loop(self):
+    def run(self):
         while not self.game_exit:
             self.robot.move()
             self.robot.check_sensors()
@@ -49,10 +52,10 @@ class Simulator:
             pygame.display.update()
             self.env.clock.tick(25)
 
-    def run(self):
-        self.game_loop()
-        pygame.quit()
-        quit()
+            # Increment step and check if the simulator should exit. Only when steps are defined
+            self.current_step += 1
+            if self.max_steps != -1 and self.current_step >= self.max_steps:
+                self.game_exit = True
 
 
 if __name__ == '__main__':
