@@ -40,8 +40,27 @@ class EvolutionaryAlgorithm:
 
         return fitness
 
-    def select_mating_pool(self):
-        pass
+    def select_mating_pool(self,fitness,number_of_parents_mating):
+		#takes robots from fintess list, by sorting indices by highest fitness(check that sorts from highes to lowest)
+		#then using those indices to take from overall robot list to selected_list
+		
+		# selected_count = 0
+		# min_value_selected = 0 #different method, not planning to use
+		
+        selected_indices = [0,0,0,0] #should create 1D array with number_of_parents_mating zero values
+		#look for highest values... and choose
+		
+        fitness_sorted = fitness.sort #not needed
+        fitness_args = argsort(fitness)
+		
+        for i in range(0, number_of_parents_mating):
+            selected_indices[i] = fitness_args[i] #not needed
+            # if fitness[i] > min_value && #different method
+            
+            # robots_selected[i] = robots_list[fitness_args[i]] 
+            robots_selected[i] = self.simulator_list[fitness_args[i]] #might give type error? better to append?
+		
+        return robots_selected
 
     def crossover(self):
         pass
