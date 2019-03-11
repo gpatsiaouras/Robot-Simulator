@@ -14,25 +14,30 @@ class EvolutionaryAlgorithm:
         # Input Parameters
         self.number_of_generations = number_of_generations
         self.robots_per_generation = robots_per_generation
+        self.exploration_steps = exploration_steps
 
         # Fixed Parameters
         self.number_of_parents_mating = 4
         self.number_of_weights = 12
+        self.number_of_nodes_hidden_layer = 5
+        self.number_of_genes = self.number_of_weights * self.number_of_nodes_hidden_layer
 
-        # Specify population
-        self.population_size = (self.robots_per_generation, self.number_of_weights)
+        # Specify population size
+        self.population_size = (self.robots_per_generation, self.number_of_genes)
 
-        # Initialize simulators
-        self.simulators_list = []
-        for i in range(self.robots_per_generation):
-            sim = Simulator(rooms.room_1, exploration_steps)
-            self.simulators_list.append(sim)
+    def weights_to_vector(self, weights1, weights2):
+        return np.append(weights1.flatten(), weights2.flatten())
 
-    def fitness(self):
+    def vector_to_weights(self, vector):
+        weights_combined = np.split(vector, [self.number_of_genes,
+                                             self.number_of_genes + 10])
+        return weights_combined[0], weights_combined[1]
+
+    def fitness(self, simulators):
         fitness = []
-        for sim_num in range(self.robots_per_generation):
-            dust_coverage = self.simulators_list[sim_num].env.dust_coverage
-            collisions = self.simulators_list[sim_num].robot.collisions
+        for simulator in simulators:
+            dust_coverage = simulator.env.dust_coverage
+            collisions = simulator.robot.collisions
 
             fitness_formula = (DUST_WEIGHT * dust_coverage * DUST_MULTIPLIER
                                + COLLISION_WEIGHT * collisions * COLLISION_PENALTY) / (DUST_WEIGHT + COLLISION_WEIGHT)
@@ -40,52 +45,83 @@ class EvolutionaryAlgorithm:
 
         return fitness
 
-    def select_mating_pool(self,fitness,number_of_parents_mating):
-		#takes robots from fintess list, by sorting indices by highest fitness(check that sorts from highes to lowest)
-		#then using those indices to take from overall robot list to selected_list
-		
-		# selected_count = 0
-		# min_value_selected = 0 #different method, not planning to use
-		
-        selected_indices = [0,0,0,0] #should create 1D array with number_of_parents_mating zero values
-		#look for highest values... and choose
-		
-        fitness_sorted = fitness.sort #not needed
-        fitness_args = argsort(fitness)
-		
-        for i in range(0, number_of_parents_mating):
-            selected_indices[i] = fitness_args[i] #not needed
-            # if fitness[i] > min_value && #different method
-            
-            # robots_selected[i] = robots_list[fitness_args[i]] 
-            robots_selected[i] = self.simulator_list[fitness_args[i]] #might give type error? better to append?
-		
-        return robots_selected
+    def select_mating_pool(self, population, fitness, number_of_parents_mating):
+        parents = np.empty((self.number_of_parents_mating, population.shape[1]))
 
-    def crossover(self):
-        pass
+        for parent_number in range(self.number_of_parents_mating):
+            index_of_max_fitness = np.where(fitness == np.max(fitness))
+            index_of_max_fitness = index_of_max_fitness[0][0]
+            parents[parent_number, :] = population[index_of_max_fitness, :]
+            fitness[index_of_max_fitness] = -99999999999
 
-    def mutation(self):
-        pass
+        return parents
+
+    def crossover(self, parents, offspring_shape):
+        offspring = np.empty(offspring_shape)
+        # We specify the crossover point to be at the center
+        crossover_point = np.uint8(offspring_shape[1] / 2)
+
+        for i in range(offspring_shape[0]):
+            # Index of the first parent
+            parent1_index = i % parents.shape[0]
+            # Index of the second parent
+            parent2_index = (i + 1) % parents.shape[0]
+            # First half from parent 1
+            offspring[i, 0:crossover_point] = parents[parent1_index, 0:crossover_point]
+            # Second half from parent 2
+            offspring[i, crossover_point:] = parents[parent2_index, crossover_point:]
+
+        return offspring
+
+    def mutation(self, crossover):
+        # Mutation changes a single gene in each offspring randomly.
+        for index in range(crossover.shape[0]):
+            # Generate a random value to add to the gene
+            random_value = np.random.uniform(0.0, 1.0, 1)
+            crossover[index, 4] = crossover[index, 4] + random_value
+
+        return crossover
 
     def evolve(self):
-        # new_population = np.random.uniform(low=0.0, high=1.0, size=self.population_size)
+        population = np.random.uniform(low=0.0, high=1.0, size=self.population_size)
 
         for generation in range(self.number_of_generations):
             print("Generation {0}#".format(generation))
-            # For each chromesome (robot in a different environment) run the simulation
-            for sim_num in range(self.robots_per_generation):
-                self.simulators_list[sim_num].run()
+
+            simulators = []
+            for i in range(self.robots_per_generation):
+                sim = Simulator(rooms.room_1, self.exploration_steps)
+                simulators.append(sim)
+                # TODO Instruct the simulator to run in "Headless" mode by
+                # giving him the weights for the ann in order to move the robot
+                # for the time of the simulation
+                sim.run()
 
             # Take the fitness of each chromosome in the population
-            print("Fitness:", end="")
-            fitness = self.fitness()
-            print(fitness, end="\n\n")
+            fitness = self.fitness(simulators)
+
             # Select the best parents in the population
-            # parents = self.select_mating_pool(new_population, fitness, number_of_parents_mating)
+            parents = self.select_mating_pool(population, fitness, self.number_of_parents_mating)
+
+            # Generate the next generation using crossover
+            offspring_shape = (self.population_size[0] - parents.shape[0], self.number_of_genes)
+            crossover = self.crossover(parents, offspring_shape)
+
+            # Add some variations to the crossover using mutation
+            mutation = self.mutation(crossover)
+
+            population[0:parents.shape[0], :] = parents
+            population[parents.shape[0]:, :] = mutation
+
+        self.printBestResult(fitness, population)
+
+    def printBestResult(self, fitness, population):
+        #TODO Implement for clarity
+        pass
 
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=10, robots_per_generation=2, exploration_steps=10)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=1, robots_per_generation=2,
+                                                   exploration_steps=200)
     evolutionary_algorithm.evolve()
