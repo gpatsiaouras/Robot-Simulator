@@ -18,28 +18,28 @@ GROUND_WEIGHT = 0.7
 # Evolutionary Algorithm
 NUMBER_OF_PARENTS_MATING = 4
 
-def plot_list(plotable): #
-	plt.plot(plotable)
-	print('hello')
-	plt.draw()
-	plt.pause(10)
-	#plt.show()
-	
+
+def plot_list(plotable):
+    plt.plot(plotable)
+    plt.draw()
+    plt.pause(10)
+
+
 def calculate_distance(list_vectors):
-	tot_distance = 0 #just adding all together
-	count_i = 0
-	for i in list_vectors:
-		count_i += 1
-		count_j = 0
-		for j in list_vectors:
-			count_j += 1
-			if count_i == count_j: #sole purpose of this counts is not calculate norms with same vector (probably irrelevant..)
-				pass
-			else:
-				dist1 = distance.euclidean(i, j) #scipy library
-				tot_distance += dist1
-	tot_distance = tot_distance/(len(list_vectors)**2)
-	return tot_distance
+    tot_distance = 0  # just adding all together
+    count_i = 0
+    for i in list_vectors:
+        count_i += 1
+        count_j = 0
+        for j in list_vectors:
+            count_j += 1
+            if count_i == count_j:  # sole purpose of this counts is not calculate norms with same vector (probably irrelevant..)
+                pass
+            else:
+                dist1 = distance.euclidean(i, j)  # scipy library
+                tot_distance += dist1
+    tot_distance = tot_distance / (len(list_vectors) ** 2)
+    return tot_distance
 
 
 class EvolutionaryAlgorithm:
@@ -137,43 +137,39 @@ class EvolutionaryAlgorithm:
                 print(i, end=" ", flush=True)
                 simulators.append(sim)
                 sim.run()
-            
-            
+
             # print('population: ')
             # print(population)
             population_list.extend(population)
             population1_list.append(population)
-            
+
             distance_gen = calculate_distance(population)
             print('distance_gen')
             print(distance_gen)
-            
+
             distance1_list.append(distance_gen)
 
             # Take the fitness of each chromosome in the population
             fitness = self.fitness(simulators)
             print(fitness)
-            
-            
+
             fitness_list.extend(fitness)
             # print('fitness_list: ')
             # print(fitness_list)
             fitness1_list.append(fitness)
             # print('fitness1_list: ')
             # print(fitness1_list)
-            average = sum(fitness)/len(fitness)
+            average = sum(fitness) / len(fitness)
             fitness_average_list.append(average)
             # print('fitness_average_list: ')
             # print(fitness_average_list)
-            
-            
+
             print('distance1_list')
             print(distance1_list)
-            
+
             print('fitness_average_list')
             print(fitness_average_list)
-            
-            
+
             # Select the best parents in the population
             parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
 
@@ -190,82 +186,8 @@ class EvolutionaryAlgorithm:
             if generation % self.save_each == 0:
                 self.save_checkpoint(generation, "/src/ckpt/", population)
 
-    def crossover2(self, robots_selected):
-        # assuming this list is always even...
-
-        # takes all parents in
-        # should return children
-
-        # random numbe between 0 and 1 * len list selected
-        # move this into random list... (funtion for randomly sort a list)?
-        # remove from that list
-
-        robtos_random = []
-
-        # if length list is not constant, create a new variable with original length list
-        for i in range(0, robots_selected):  # does length stay constant, even if loop reducing...
-            a = np.random  # rundom number 0 and 1
-            index = a * robots_selected.length  # this is NEW length
-            robots_random.append(robots_selected[i])  # check..
-            del robots_selected[i]  # check #so that this robot is chosen only once
-
-        offspring_list = []
-
-        # now, select in pairs and apply misture
-        for i in range(0, robots_random.length / 2):
-            k = 2 * i
-            offspring = mixture(robots_random(k), robots_random(k + 1))  ##Here is where they mix
-            offspring_list.append(offspring)  # check
-
-        return offspring_list
-
-    def mixture2(parent1, parent2):  # way of crossing genes..
-
-        weights_A1 = a.weights1
-        weights_B1 = b.weights1
-
-        weights_A2 = a.weights2
-        weights_B2 = b.weights2
-
-        weights_C1 = np.zeros  # create new instance robot?
-        weights_C2 = np.zeros
-
-        changed_matrix1 = np.zeros
-        changed_matrix2 = np.zeros
-
-        # also: choose randomly x spaces --> generate vector random positions
-        vectorx1 = [random.randint(1, weights_C1[0].length) for _ in range(number_genes / 2)]  ##assume even?
-        vectory1 = [random.randint(1, weights_C1.length) for _ in range(number_genes / 2)]
-
-        vectorx2 = [random.randint(1, weights_C2[0].length) for _ in range(number_genes / 2)]  ##assume even?
-        vectory2 = [random.randint(1, weights_C2.length) for _ in range(number_genes / 2)]
-
-        # this might repeat some...
-
-        for i in range(0, number_genes / 2):  # this range needs to corrected I beleive..
-            a = vectorx1[i]
-            b = vectory1[i]
-            weights_C1[a][b] = weights_A1[a][b]
-            changed_matrix1[a][b] = 1
-
-        for i in range(0, changed_matrix1.length):
-            for j in range(0, changed_matrix1.length):
-                if changed_matrix1[i][j] == 0:  # has not been changed, mean this is for the other parent to fill in
-                    weights_C1[i][j] = weights_B1[i][j]
-
-        # weights2 ##NEEDS TO BE ADJUSTED
-        for i in range(0, number_genes / 2):
-            a = vectorx2[i]
-            b = vectory2[i]
-            weights_C2[a][b] = weights_A2[a][b]
-            changed_matrix2[a][b] = 1
-
-        for i in range(0, changed_matrix2.length):
-            for j in range(0, changed_matrix2.length):
-                if changed_matrix2[i][j] == 0:  # has not been changed, mean this is for the other parent to fill in
-                    weights_C2[i][j] = weights_B2[i][j]
-
-        return weight_C1, weights_C2
+        print("Best Weights:")
+        print(self.vector_to_weights(parents[0]))
 
     def printBestResult(self, fitness, population):
         print(fitness)
@@ -293,34 +215,32 @@ class EvolutionaryAlgorithm:
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=16, robots_per_generation=10,
-                                                   exploration_steps=200)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=2, robots_per_generation=10,
+                                                   exploration_steps=200, save_each=2)
     fitness_list = []
     fitness1_list = []
     fitness_average_list = []
-    
+
     population_list = []
     population1_list = []
-    population_average_list = [] #not sure any use
-    
+    population_average_list = []  # not sure any use
+
     distance1_list = []
-    
-    #save to txt later (to have comparisons..)
+
+    # save to txt later (to have comparisons..)
     evolutionary_algorithm.evolve()
     # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_8.txt")
-    
-    
+
     print('distance1_list')
     print(distance1_list)
     print('fitness_average_list')
     print(fitness_average_list)
-    
+
     print('fitness1_list')
     print(fitness1_list)
-    
+
     print('fitness_list')
     print(fitness_list)
-    
-    
+
     plot_list(distance1_list)
     plot_list(fitness_average_list)
