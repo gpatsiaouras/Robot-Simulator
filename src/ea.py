@@ -1,3 +1,6 @@
+import os
+import random
+
 import numpy as np
 import rooms
 from main import Simulator
@@ -13,12 +16,12 @@ NUMBER_OF_PARENTS_MATING = 4
 
 
 class EvolutionaryAlgorithm:
-    def __init__(self, number_of_generations, robots_per_generation, exploration_steps):
+    def __init__(self, number_of_generations, robots_per_generation, exploration_steps, save_each=None):
         # Input Parameters
         self.number_of_generations = number_of_generations
         self.robots_per_generation = robots_per_generation
         self.exploration_steps = exploration_steps
-
+        self.save_each = save_each
         # Fixed Parameters of the ANN
         self.number_of_nodes_input_layer = 17
         self.number_of_nodes_hidden_layer = 5
@@ -90,10 +93,13 @@ class EvolutionaryAlgorithm:
 
         return crossover
 
-    def evolve(self):
-        population = np.random.uniform(low=-5.0, high=5.0, size=self.population_size)
+    def evolve(self, start_population=None, start_gen=0):
+        if start_population is None:
+            population = np.random.uniform(low=-5.0, high=5.0, size=self.population_size)
+        else:
+            population = start_population
 
-        for generation in range(self.number_of_generations):
+        for generation in range(start_gen, self.number_of_generations):
             print("Generation {0}#".format(generation))
 
             simulators = []
@@ -119,6 +125,9 @@ class EvolutionaryAlgorithm:
 
             population[0:parents.shape[0], :] = parents
             population[parents.shape[0]:, :] = mutation
+
+            if generation % self.save_each == 0:
+                self.save_checkpoint(generation, "/src/ckpt/", population)
 
     def crossover2(self, robots_selected):
         # assuming this list is always even...
@@ -201,9 +210,29 @@ class EvolutionaryAlgorithm:
         print(fitness)
         pass
 
+    def save_checkpoint(self, generation, out_dir, population):
+
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+
+        final_dir = curr_path + out_dir + str(generation)
+        if not os.path.exists(os.path.join("ckpt")):
+            os.makedirs("ckpt")
+        # torch.save(state, os.path.join(final_dir, "{}_{}.ckpt".format(learner, episode)))
+        ckpt = open("ckpt/gen_{}.txt".format(generation), "w+")
+        population.tofile(ckpt)
+
+    def evolve_checkpoint(self, ckpt_dir):
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        ckpt_dir = curr_path + ckpt_dir
+        ckpt = open(ckpt_dir, "r")
+        population = np.fromfile(ckpt)
+        start_gen = int(ckpt_dir.split("_").pop()[:-4])
+        self.evolve(population, start_gen)
+
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=10, robots_per_generation=10,
-                                                   exploration_steps=200)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=15, robots_per_generation=6,
+                                                   exploration_steps=20, save_each=2)
     evolutionary_algorithm.evolve()
+    # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_8.txt")
