@@ -23,6 +23,7 @@ def plot_list(plotable):
     plt.plot(plotable)
     plt.draw()
     plt.pause(10)
+    plt.show()
 
 
 def calculate_distance(list_vectors):
@@ -144,14 +145,14 @@ class EvolutionaryAlgorithm:
             population1_list.append(population)
 
             distance_gen = calculate_distance(population)
-            print('distance_gen')
-            print(distance_gen)
+            # print('distance_gen')
+            # print(distance_gen)
 
             distance1_list.append(distance_gen)
 
             # Take the fitness of each chromosome in the population
             fitness = self.fitness(simulators)
-            print(fitness)
+            print("\nFitness: " + str(fitness))
 
             fitness_list.extend(fitness)
             # print('fitness_list: ')
@@ -164,11 +165,11 @@ class EvolutionaryAlgorithm:
             # print('fitness_average_list: ')
             # print(fitness_average_list)
 
-            print('distance1_list')
-            print(distance1_list)
+            # print('distance1_list')
+            # print(distance1_list)
 
-            print('fitness_average_list')
-            print(fitness_average_list)
+            # print('fitness_average_list')
+            # print(fitness_average_list)
 
             # Select the best parents in the population
             parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
@@ -184,23 +185,31 @@ class EvolutionaryAlgorithm:
             population[parents.shape[0]:, :] = mutation
 
             if generation % self.save_each == 0:
-                self.save_checkpoint(generation, "/src/ckpt/", population)
+                self.save_checkpoint(generation, population)
 
-        print("Best Weights:")
-        print(self.vector_to_weights(parents[0]))
+            if generation == self.number_of_generations - 1:
+                best_chromosome_index = np.where(fitness == np.max(fitness))
 
-    def printBestResult(self, fitness, population):
-        print(fitness)
-        pass
+                # Retrieve the weights from the chromosome
+                weights1, weights2 = self.vector_to_weights(population[best_chromosome_index].T)
 
-    def save_checkpoint(self, generation, out_dir, population):
+                # Print the best weights
+                print("Best Weights:")
+                print(weights1)
+                print(weights2)
 
-        curr_path = os.path.dirname(os.path.abspath(__file__))
+                # self.run_chromosome_on_simulator(weights1, weights2)
 
-        final_dir = curr_path + out_dir + str(generation)
+    def run_chromosome_on_simulator(self, weights1, weights2):
+        # Demonstrate on the simulator
+        sim = Simulator(rooms.room_1, max_steps=-1, autonomous=True, pygame_enabled=True)
+        sim.network.weights1 = weights1
+        sim.network.weights2 = weights2
+        sim.run()
+
+    def save_checkpoint(self, generation, population):
         if not os.path.exists(os.path.join("ckpt")):
             os.makedirs("ckpt")
-        # torch.save(state, os.path.join(final_dir, "{}_{}.ckpt".format(learner, episode)))
         ckpt = open("ckpt/gen_{}.txt".format(generation), "w+")
         population.tofile(ckpt)
 
@@ -208,15 +217,15 @@ class EvolutionaryAlgorithm:
         curr_path = os.path.dirname(os.path.abspath(__file__))
         ckpt_dir = curr_path + ckpt_dir
         ckpt = open(ckpt_dir, "r")
-        population = np.fromfile(ckpt)
+        population = np.fromfile(ckpt, dtype=np.float64)
         start_gen = int(ckpt_dir.split("_").pop()[:-4])
-        self.evolve(population, start_gen)
+        self.evolve(population.reshape(self.robots_per_generation, self.number_of_genes), start_gen)
 
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=2, robots_per_generation=10,
-                                                   exploration_steps=200, save_each=2)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=30, robots_per_generation=10,
+                                                   exploration_steps=2000, save_each=2)
     fitness_list = []
     fitness1_list = []
     fitness_average_list = []
@@ -229,18 +238,18 @@ if __name__ == '__main__':
 
     # save to txt later (to have comparisons..)
     evolutionary_algorithm.evolve()
-    # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_8.txt")
+    # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_28.txt")
 
-    print('distance1_list')
-    print(distance1_list)
-    print('fitness_average_list')
-    print(fitness_average_list)
-
-    print('fitness1_list')
-    print(fitness1_list)
-
-    print('fitness_list')
-    print(fitness_list)
+    # print('distance1_list')
+    # print(distance1_list)
+    # print('fitness_average_list')
+    # print(fitness_average_list)
+    #
+    # print('fitness1_list')
+    # print(fitness1_list)
+    #
+    # print('fitness_list')
+    # print(fitness_list)
 
     plot_list(distance1_list)
     plot_list(fitness_average_list)
