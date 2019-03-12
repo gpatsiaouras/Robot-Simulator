@@ -17,8 +17,8 @@ class Simulator:
     def __init__(self, room, max_steps=-1, autonomous=False):
         self.autonomous = autonomous
         self.robot = Robot(ROBOT_DIAMETER, 0, [100, 100])
-        self.env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, room, self.robot)
-        self.robot.setObst(self.env.obstacles_rects, self.env.obstacles_parameters)
+        self.env = Environment(SCREEN_WIDTH, SCREEN_HEIGHT, room, self.robot, pygame_enabled=True)
+        self.robot.set_obstacles(self.env.obstacles_coord, self.env.obstacles_parameters)
         self.game_exit = False
 
         self.network = ANN()
@@ -71,7 +71,7 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(rooms.room_1, autonomous=True)
+    simulator = Simulator(rooms.room_1, autonomous=False)
     simulator.network.weights1 = np.random.rand(17, 5)
     simulator.network.weights2 = np.random.rand(5, 2)
     simulator.run()

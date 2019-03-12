@@ -14,25 +14,27 @@ class Environment:
     DUST_DOT_WIDTH = 3
     PADDING = 50
 
-    def __init__(self, width=800, height=800, obstacles=None, robot=None):
+    def __init__(self, width=800, height=800, obstacles=None, robot=None, pygame_enabled=False):
         """
-        :param width:
-        :param height:
+        :param width:           Width of window
+        :param height:          Height of window
         :param obstacles:       list of lists where each sublist is [x_from, x_to, y_from, y_to]
-        :param robot:           list of robots object in the environment
+        :param robot:           Robot Object
         """
 
         # initialize dimension of the world
         self.width = width
         self.height = height
+        self.pygame_enabled = pygame_enabled
 
-        pygame.init()
-        pygame.font.init()
-        self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
+        if self.pygame_enabled:
+            pygame.init()
+            pygame.font.init()
+            self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
-        self.gameDisplay = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption('Differential Robot Simulator')
-        self.clock = pygame.time.Clock()
+            self.gameDisplay = pygame.display.set_mode((self.width, self.height))
+            pygame.display.set_caption('Differential Robot Simulator')
+            self.clock = pygame.time.Clock()
 
         # initialize robot
         self.robot = robot
@@ -42,27 +44,33 @@ class Environment:
         self.dust_matrix_width = int(self.width / self.dust_dots_intensity)
         self.dust_matrix_height = int(self.height / self.dust_dots_intensity)
         self.dust_total = self.dust_matrix_width * self.dust_matrix_height
-        self.dust_matrix, self.dust_point = self.initialize_dust()
+
+        # Zero(0) means that there is dust.
+        # Minus one (-1) means that robot passed by this spot so there is not dust anymore
+        self.dust_matrix = np.ones((self.dust_matrix_width, self.dust_matrix_height))
+
         self.dust_coverage = 1  # 100% dust coverage when we start
         self.ground_coverage = 1 - self.dust_coverage
+        if self.pygame_enabled:
+            self.dust_point = [[None for j in range(self.dust_matrix_width)] for i in range(self.dust_matrix_height)]
 
         # OBSTACLES
 
-        # initialize walls object (rects)
-        self.obstacles_rects = []
+        if self.pygame_enabled:
+            # initialize walls object (rects)
+            self.obstacles_rects = []
 
         # obstacle coordinates, handy for wall collision
         self.obstacles_coord = obstacles
 
         # If no coordinates are passed, initialize empty room (with border walls)
         if self.obstacles_coord is None:
-            self.obstacles_coord = [[0 + self.PADDING, 0 + self.PADDING, self.width - self.PADDING, 0 + self.PADDING],
-                                    [self.width - self.PADDING, 0 + self.PADDING, self.width - self.PADDING,
-                                     self.height - self.PADDING],
-                                    [self.width - self.PADDING, self.height - self.PADDING, 0 + self.PADDING,
-                                     self.height - self.PADDING],
-                                    [0 + self.PADDING, self.height - self.PADDING, 0 + self.PADDING, 0 + self.PADDING]
-                                    ]
+            self.obstacles_coord = [
+                [0 + self.PADDING, 0 + self.PADDING, self.width - self.PADDING, 0 + self.PADDING],
+                [self.width - self.PADDING, 0 + self.PADDING, self.width - self.PADDING,self.height - self.PADDING],
+                [self.width - self.PADDING, self.height - self.PADDING, 0 + self.PADDING,self.height - self.PADDING],
+                [0 + self.PADDING, self.height - self.PADDING, 0 + self.PADDING, 0 + self.PADDING]
+            ]
 
         # obstacles parameters, handy for sensor values
         self.obstacles_parameters = np.zeros((len(self.obstacles_coord), 2))
@@ -71,9 +79,6 @@ class Environment:
         self.add_obstacles()
 
     def add_obstacles(self):
-
-        # for counter, obst in enumerate(self.obstacles_rects):
-
         # obstacles parameters
         for count, obst in enumerate(self.obstacles_coord):
             # sensors functions parameters
@@ -93,54 +98,49 @@ class Environment:
             self.obstacles_parameters[count][1] = self.obstacles_coord[count][1] - (
                     self.obstacles_parameters[count][0] * self.obstacles_coord[count][0])
 
-            # draw current wall and store Rect object
-            curr_wall = pygame.draw.line(self.gameDisplay, self.BLACK,
-                                         (self.obstacles_coord[count][0], self.obstacles_coord[count][1]),
-                                         (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 5)
-            self.obstacles_rects.append(curr_wall)
+            if self.pygame_enabled:
+                # draw current wall and store Rect object
+                curr_wall = pygame.draw.line(self.gameDisplay, self.BLACK,
+                                             (self.obstacles_coord[count][0], self.obstacles_coord[count][1]),
+                                             (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 5)
+                self.obstacles_rects.append(curr_wall)
 
             # print("############################ INIT WALLS COORD + PARAMS ############################")
             # print(self.obstacles_coord)
             # print(self.obstacles_parameters)
 
-    def initialize_dust(self):
-        # Zero(0) means that there is dust.
-        # Minus one (-1) means that robot passed by this spot so there is not dust anymore
-        dust_matrix = np.ones((self.dust_matrix_width, self.dust_matrix_height))
-        dust_point = [[None for j in range(self.dust_matrix_width)] for i in range(self.dust_matrix_height)]
-
-        return dust_matrix, dust_point
-
     def reset_background(self):
         # Draw everything white
         self.gameDisplay.fill(self.WHITE)
 
-    def calculate_dust_coverage(self):
-        # TODO Could be faster if we did in the same function that we draw the dust
-        # because when we draw the dust we actually know if a dust point became 0 so we can
-        # just decrement it and then we wont have to do this double for.
-        dust_on_screen = 0
-        for i in range(self.dust_matrix_width):
-            for j in range(self.dust_matrix_height):
-                if self.dust_matrix[i][j] != 0:
-                    dust_on_screen += 1
-
+    def calculate_dust_and_ground_coverage(self):
+        dust_on_screen = np.count_nonzero(self.dust_matrix)
         self.dust_coverage = dust_on_screen / self.dust_total
         self.ground_coverage = 1 - self.dust_coverage
 
     def draw_dust(self):
-        for i in range(self.dust_matrix_width):
-            for j in range(self.dust_matrix_height):
-                # First check if the dust_point is not None because it could be the first time that we draw
-                # Then if yes, remove the footprint of the robot from the dust matrix by changing the value to 0
-                if self.dust_point[i][j] is not None and self.robot.robot_rect.colliderect(self.dust_point[i][j]):
+        # By knowing the position of the robot and it's radius we can mark all of the dust point in the matrix
+        # that the robot "touches"
+        # But instead of checking all of the dots of the grid and their distance to the robot we just check the closest
+        # ones to it by taking the position of the robot dividing by the dot intensity to bring the robot to the same
+        # cartesian system as the dots and then we go -10 +10 up and down and only check this part.
+        for i in range(int(self.robot.position[0]) // self.dust_dots_intensity - 10,
+                       int(self.robot.position[0]) // self.dust_dots_intensity + 10, 1):
+            for j in range(int(self.robot.position[1]) // self.dust_dots_intensity - 10,
+                           int(self.robot.position[1]) // self.dust_dots_intensity + 10, 1):
+                pythagorian_distance = np.sqrt((self.robot.position[0] - i * self.dust_dots_intensity) ** 2 + (
+                        self.robot.position[1] - j * self.dust_dots_intensity) ** 2)
+                if pythagorian_distance < self.robot.radius:
                     self.dust_matrix[i][j] = 0
 
-                # Draw this dot if the dust_matrix has the value 1
-                if self.dust_matrix[i][j] == 1:
-                    self.dust_point[i][j] = pygame.draw.circle(self.gameDisplay, self.DUST_DOTS_COLOR,
-                                                         [i * self.dust_dots_intensity,
-                                                          j * self.dust_dots_intensity], self.DUST_DOT_WIDTH)
+        # Draw this dot if the dust_matrix has the value 1 and pygame is enabled
+        if self.pygame_enabled:
+            for i in range(self.dust_matrix_width):
+                for j in range(self.dust_matrix_height):
+                    if self.dust_matrix[i][j] == 1:
+                        self.dust_point[i][j] = pygame.draw.circle(self.gameDisplay, self.DUST_DOTS_COLOR,
+                                                                   [i * self.dust_dots_intensity,
+                                                                    j * self.dust_dots_intensity], self.DUST_DOT_WIDTH)
 
     def draw_obstacles(self):
         for count, obst in enumerate(self.obstacles_coord):
@@ -200,14 +200,16 @@ class Environment:
             self.robot.sensors_rects = updated_sensors
 
     def render(self):
-        self.reset_background()
+        if self.pygame_enabled:
+            self.reset_background()
 
-        # Draw components. Ordering of draw matters for the window to look nice
-        self.draw_robot()
+            # Draw components. Ordering of draw matters for the window to look nice
+            self.draw_robot()
         self.draw_dust()
-        self.draw_osd()
-        self.draw_obstacles()
-        self.draw_sensors()
+        if self.pygame_enabled:
+            self.draw_osd()
+            self.draw_obstacles()
+            self.draw_sensors()
 
         # Calculate Dust coverage (needed or Evolutionary Algorithm)
-        self.calculate_dust_coverage()
+        self.calculate_dust_and_ground_coverage()
