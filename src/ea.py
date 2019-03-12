@@ -1,11 +1,9 @@
 import os
-import random
-
 import numpy as np
 import rooms
+import time
 from main import Simulator
-
-import matplotlib.pyplot as plt
+from ea_plotter import EvolutionaryAlgorithmPlotter
 
 from scipy.spatial import distance
 
@@ -18,12 +16,7 @@ GROUND_WEIGHT = 0.7
 # Evolutionary Algorithm
 NUMBER_OF_PARENTS_MATING = 4
 
-
-def plot_list(plotable):
-    plt.plot(plotable)
-    plt.draw()
-    plt.pause(10)
-    plt.show()
+np.set_printoptions(precision=2)
 
 
 def calculate_distance(list_vectors):
@@ -43,6 +36,14 @@ def calculate_distance(list_vectors):
     return tot_distance
 
 
+def run_chromosome_on_simulator(weights1, weights2, steps=-1):
+    # Demonstrate on the simulator
+    sim = Simulator(rooms.room_1, max_steps=steps, autonomous=True, pygame_enabled=True)
+    sim.network.weights1 = weights1
+    sim.network.weights2 = weights2
+    sim.run()
+
+
 class EvolutionaryAlgorithm:
     def __init__(self, number_of_generations, robots_per_generation, exploration_steps, save_each=None):
         # Input Parameters
@@ -54,6 +55,11 @@ class EvolutionaryAlgorithm:
         self.number_of_nodes_input_layer = 17
         self.number_of_nodes_hidden_layer = 5
         self.number_of_nodes_output_layer = 2
+
+        # Statistical data
+        self.fitness_average = []
+        self.fitness_maximum = []
+        self.diversity = []
 
         # Calculating the number of genes based on the layers of the RNN used to calculate the motion
         self.number_of_genes = self.number_of_nodes_input_layer * self.number_of_nodes_hidden_layer \
@@ -127,6 +133,7 @@ class EvolutionaryAlgorithm:
         else:
             population = start_population
 
+        start = time.time()
         for generation in range(start_gen, self.number_of_generations):
             print("\nGeneration {0}#".format(generation))
 
@@ -139,37 +146,13 @@ class EvolutionaryAlgorithm:
                 simulators.append(sim)
                 sim.run()
 
-            # print('population: ')
-            # print(population)
-            population_list.extend(population)
-            population1_list.append(population)
-
-            distance_gen = calculate_distance(population)
-            # print('distance_gen')
-            # print(distance_gen)
-
-            distance1_list.append(distance_gen)
+            self.diversity.append(calculate_distance(population))
 
             # Take the fitness of each chromosome in the population
             fitness = self.fitness(simulators)
+            self.fitness_average.append(np.average(fitness))
+            self.fitness_maximum.append(np.max(fitness))
             print("\nFitness: " + str(fitness))
-
-            fitness_list.extend(fitness)
-            # print('fitness_list: ')
-            # print(fitness_list)
-            fitness1_list.append(fitness)
-            # print('fitness1_list: ')
-            # print(fitness1_list)
-            average = sum(fitness) / len(fitness)
-            fitness_average_list.append(average)
-            # print('fitness_average_list: ')
-            # print(fitness_average_list)
-
-            # print('distance1_list')
-            # print(distance1_list)
-
-            # print('fitness_average_list')
-            # print(fitness_average_list)
 
             # Select the best parents in the population
             parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
@@ -184,9 +167,13 @@ class EvolutionaryAlgorithm:
             population[0:parents.shape[0], :] = parents
             population[parents.shape[0]:, :] = mutation
 
+            # Save checkpoint according to frequency requested
             if generation % self.save_each == 0:
                 self.save_checkpoint(generation, population)
 
+            print("Time elapsed: {0}".format1(time.time() - start))
+
+            # If this is the last generation
             if generation == self.number_of_generations - 1:
                 best_chromosome_index = np.where(fitness == np.max(fitness))
 
@@ -194,18 +181,11 @@ class EvolutionaryAlgorithm:
                 weights1, weights2 = self.vector_to_weights(population[best_chromosome_index].T)
 
                 # Print the best weights
-                print("Best Weights:")
+                print("\nBest Weights:")
                 print(weights1)
                 print(weights2)
 
-                # self.run_chromosome_on_simulator(weights1, weights2)
-
-    def run_chromosome_on_simulator(self, weights1, weights2):
-        # Demonstrate on the simulator
-        sim = Simulator(rooms.room_1, max_steps=-1, autonomous=True, pygame_enabled=True)
-        sim.network.weights1 = weights1
-        sim.network.weights2 = weights2
-        sim.run()
+                return weights1, weights2
 
     def save_checkpoint(self, generation, population):
         if not os.path.exists(os.path.join("ckpt")):
@@ -219,37 +199,24 @@ class EvolutionaryAlgorithm:
         ckpt = open(ckpt_dir, "r")
         population = np.fromfile(ckpt, dtype=np.float64)
         start_gen = int(ckpt_dir.split("_").pop()[:-4])
-        self.evolve(population.reshape(self.robots_per_generation, self.number_of_genes), start_gen)
+        return self.evolve(population.reshape(self.robots_per_generation, self.number_of_genes), start_gen)
 
 
 if __name__ == '__main__':
-    # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=30, robots_per_generation=10,
-                                                   exploration_steps=2000, save_each=2)
-    fitness_list = []
-    fitness1_list = []
-    fitness_average_list = []
+    # Initiate the evolutionary algorithm with parameters
+    evolutionary_algorithm = EvolutionaryAlgorithm(
+        number_of_generations=30,
+        robots_per_generation=50,
+        exploration_steps=2000,
+        save_each=2
+    )
 
-    population_list = []
-    population1_list = []
-    population_average_list = []  # not sure any use
+    weights1, weights2 = evolutionary_algorithm.evolve()
+    # weights1, weights2 = evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_70.txt")
 
-    distance1_list = []
+    # Plot Data
+    plotter = EvolutionaryAlgorithmPlotter(evolutionary_algorithm)
+    plotter.plot()
 
-    # save to txt later (to have comparisons..)
-    evolutionary_algorithm.evolve()
-    # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_28.txt")
-
-    # print('distance1_list')
-    # print(distance1_list)
-    # print('fitness_average_list')
-    # print(fitness_average_list)
-    #
-    # print('fitness1_list')
-    # print(fitness1_list)
-    #
-    # print('fitness_list')
-    # print(fitness_list)
-
-    plot_list(distance1_list)
-    plot_list(fitness_average_list)
+    # Demonstrate on the simulator by replicating the best individual weights
+    run_chromosome_on_simulator(weights1, weights2)
