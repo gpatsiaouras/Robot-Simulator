@@ -5,6 +5,10 @@ import numpy as np
 import rooms
 from main import Simulator
 
+import matplotlib.pyplot as plt
+
+from scipy.spatial import distance
+
 # Fitness Formula Parameters
 COLLISION_PENALTY = -0.5
 COLLISION_WEIGHT = 0.3
@@ -13,6 +17,29 @@ GROUND_WEIGHT = 0.7
 
 # Evolutionary Algorithm
 NUMBER_OF_PARENTS_MATING = 4
+
+def plot_list(plotable): #
+	plt.plot(plotable)
+	print('hello')
+	plt.draw()
+	plt.pause(10)
+	#plt.show()
+	
+def calculate_distance(list_vectors):
+	tot_distance = 0 #just adding all together
+	count_i = 0
+	for i in list_vectors:
+		count_i += 1
+		count_j = 0
+		for j in list_vectors:
+			count_j += 1
+			if count_i == count_j: #sole purpose of this counts is not calculate norms with same vector (probably irrelevant..)
+				pass
+			else:
+				dist1 = distance.euclidean(i, j) #scipy library
+				tot_distance += dist1
+	tot_distance = tot_distance/(len(list_vectors)**2)
+	return tot_distance
 
 
 class EvolutionaryAlgorithm:
@@ -110,10 +137,43 @@ class EvolutionaryAlgorithm:
                 print(i, end=" ", flush=True)
                 simulators.append(sim)
                 sim.run()
+            
+            
+            # print('population: ')
+            # print(population)
+            population_list.extend(population)
+            population1_list.append(population)
+            
+            distance_gen = calculate_distance(population)
+            print('distance_gen')
+            print(distance_gen)
+            
+            distance1_list.append(distance_gen)
 
             # Take the fitness of each chromosome in the population
             fitness = self.fitness(simulators)
             print(fitness)
+            
+            
+            fitness_list.extend(fitness)
+            # print('fitness_list: ')
+            # print(fitness_list)
+            fitness1_list.append(fitness)
+            # print('fitness1_list: ')
+            # print(fitness1_list)
+            average = sum(fitness)/len(fitness)
+            fitness_average_list.append(average)
+            # print('fitness_average_list: ')
+            # print(fitness_average_list)
+            
+            
+            print('distance1_list')
+            print(distance1_list)
+            
+            print('fitness_average_list')
+            print(fitness_average_list)
+            
+            
             # Select the best parents in the population
             parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
 
@@ -233,7 +293,34 @@ class EvolutionaryAlgorithm:
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=20, robots_per_generation=20,
-                                                   exploration_steps=2000, save_each=2)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=16, robots_per_generation=10,
+                                                   exploration_steps=200)
+    fitness_list = []
+    fitness1_list = []
+    fitness_average_list = []
+    
+    population_list = []
+    population1_list = []
+    population_average_list = [] #not sure any use
+    
+    distance1_list = []
+    
+    #save to txt later (to have comparisons..)
     evolutionary_algorithm.evolve()
     # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_8.txt")
+    
+    
+    print('distance1_list')
+    print(distance1_list)
+    print('fitness_average_list')
+    print(fitness_average_list)
+    
+    print('fitness1_list')
+    print(fitness1_list)
+    
+    print('fitness_list')
+    print(fitness_list)
+    
+    
+    plot_list(distance1_list)
+    plot_list(fitness_average_list)
