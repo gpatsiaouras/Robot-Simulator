@@ -100,13 +100,14 @@ class EvolutionaryAlgorithm:
             population = start_population
 
         for generation in range(start_gen, self.number_of_generations):
-            print("Generation {0}#".format(generation))
+            print("\nGeneration {0}#".format(generation))
 
             simulators = []
+            print("Robot running: ", end="", flush=True)
             for i in range(self.robots_per_generation):
-                sim = Simulator(rooms.room_1, self.exploration_steps, autonomous=True)
+                sim = Simulator(rooms.room_1, self.exploration_steps, autonomous=True, pygame_enabled=False)
                 sim.network.weights1, sim.network.weights2 = self.vector_to_weights(population[i])
-
+                print(i, end=" ", flush=True)
                 simulators.append(sim)
                 sim.run()
 
@@ -232,7 +233,7 @@ class EvolutionaryAlgorithm:
 
 if __name__ == '__main__':
     # Initiate the evolutionary algorithm
-    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=15, robots_per_generation=6,
-                                                   exploration_steps=20, save_each=2)
+    evolutionary_algorithm = EvolutionaryAlgorithm(number_of_generations=20, robots_per_generation=20,
+                                                   exploration_steps=2000, save_each=2)
     evolutionary_algorithm.evolve()
     # evolutionary_algorithm.evolve_checkpoint("/ckpt/gen_8.txt")
