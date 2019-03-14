@@ -1,8 +1,6 @@
 import numpy as np
 from math import hypot as hyp
 
-from numpy.linalg import LinAlgError
-
 
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position):
@@ -31,6 +29,14 @@ class Robot:
 
         # Collision Data (for evolution algorithm)
         self.collisions = 0
+
+    def reset(self, theta, position):
+        self.theta = theta
+        self.position = position
+        self.update_sensor_values()
+        self.collisions = 0
+        self.left_wheel_velocity = 0
+        self.right_wheel_velocity = 0
 
     def update_sensor_values(self):
         count = 0

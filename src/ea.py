@@ -78,15 +78,12 @@ class EvolutionaryAlgorithm:
         return weights_combined[0].reshape(self.number_of_nodes_input_layer, self.number_of_nodes_hidden_layer), \
                weights_combined[1].reshape(self.number_of_nodes_hidden_layer, self.number_of_nodes_output_layer)
 
-    def fitness(self, simulators):
-        fitness = []
-        for simulator in simulators:
-            ground_coverage = simulator.env.ground_coverage
-            collisions = simulator.robot.collisions
+    def fitness(self, simulator):
+        ground_coverage = simulator.env.ground_coverage
+        collisions = simulator.robot.collisions
 
-            fitness_formula = (GROUND_WEIGHT * ground_coverage * GROUND_MULTIPLIER
-                               + COLLISION_WEIGHT * collisions * COLLISION_PENALTY) / (GROUND_WEIGHT + COLLISION_WEIGHT)
-            fitness.append(fitness_formula)
+        fitness = (GROUND_WEIGHT * ground_coverage * GROUND_MULTIPLIER
+                           + COLLISION_WEIGHT * collisions * COLLISION_PENALTY) / (GROUND_WEIGHT + COLLISION_WEIGHT)
 
         return fitness
 
@@ -133,23 +130,21 @@ class EvolutionaryAlgorithm:
         else:
             population = start_population
 
-        start = time.time()
+        simulator = Simulator(rooms.room_1, self.exploration_steps, autonomous=True, pygame_enabled=False)
         for generation in range(start_gen, self.number_of_generations):
+            start = time.time()
             print("\nGeneration {0}#".format(generation))
-
-            simulators = []
             print("Robot running: ", end="", flush=True)
+            fitness = []
             for i in range(self.robots_per_generation):
-                sim = Simulator(rooms.room_1, self.exploration_steps, autonomous=True, pygame_enabled=False)
-                sim.network.weights1, sim.network.weights2 = self.vector_to_weights(population[i])
+                simulator.reset()
+                simulator.network.weights1, simulator.network.weights2 = self.vector_to_weights(population[i])
                 print(i, end=" ", flush=True)
-                simulators.append(sim)
-                sim.run()
+                simulator.run()
+                fitness.append(self.fitness(simulator))
 
             self.diversity.append(calculate_distance(population))
 
-            # Take the fitness of each chromosome in the population
-            fitness = self.fitness(simulators)
             self.fitness_average.append(np.average(fitness))
             self.fitness_maximum.append(np.max(fitness))
             print("\nFitness: " + str(fitness))
@@ -171,7 +166,7 @@ class EvolutionaryAlgorithm:
             if generation % self.save_each == 0:
                 self.save_checkpoint(generation, population)
 
-            print("Time elapsed: {0}".format1(time.time() - start))
+            print("Time elapsed: {0}".format(time.time() - start))
 
             # If this is the last generation
             if generation == self.number_of_generations - 1:
@@ -206,8 +201,8 @@ if __name__ == '__main__':
     # Initiate the evolutionary algorithm with parameters
     evolutionary_algorithm = EvolutionaryAlgorithm(
         number_of_generations=30,
-        robots_per_generation=50,
-        exploration_steps=2000,
+        robots_per_generation=10,
+        exploration_steps=1000,
         save_each=2
     )
 

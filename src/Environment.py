@@ -78,6 +78,11 @@ class Environment:
         # Add obstacles
         self.add_obstacles()
 
+    def reset(self):
+        self.dust_matrix = np.ones((self.dust_matrix_width, self.dust_matrix_height))
+        self.dust_coverage = 1  # 100% dust coverage when we start
+        self.ground_coverage = 1 - self.dust_coverage
+
     def add_obstacles(self):
         # obstacles parameters
         for count, obst in enumerate(self.obstacles_coord):

@@ -28,6 +28,13 @@ class Simulator:
         self.max_steps = max_steps
         self.env.render()
 
+    def reset(self):
+        self.game_exit = False
+        self.current_step = 0
+        self.robot.reset(theta=0, position=[100, 100])
+        self.env.reset()
+        self.env.render()
+
     def run(self):
         while not self.game_exit:
             self.robot.move()
@@ -54,6 +61,8 @@ class Simulator:
                             self.robot.decrement_both_wheels()
                         if event.key == pygame.K_x:
                             self.robot.stop_motors()
+                        if event.key == pygame.K_z:
+                            self.reset()
 
             if self.autonomous:
                 # Change the sensor values from a list to numpy array so that the ann can read it
@@ -74,7 +83,7 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(rooms.room_1, autonomous=True, pygame_enabled=False)
+    simulator = Simulator(rooms.room_1, autonomous=False, pygame_enabled=True)
     simulator.network.weights1 = np.random.rand(17, 5)
     simulator.network.weights2 = np.random.rand(5, 2)
     simulator.run()
