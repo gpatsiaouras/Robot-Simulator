@@ -157,8 +157,8 @@ class Environment:
         osd_text_1 = 'Robot Velocity:'
         osd_text_2 = 'Left Wheel:{0}'.format(self.robot.left_wheel_velocity)
         osd_text_3 = 'Right Wheel:{0}'.format(self.robot.right_wheel_velocity)
-        osd_text_4 = 'Theta:{0}'.format(self.robot.theta)
-        osd_text_5 = 'Ground Coverage:{0}'.format(self.ground_coverage)
+        osd_text_4 = 'Theta:{0:.2f}'.format(self.robot.theta)
+        osd_text_5 = 'Ground Coverage:{0:.2f}'.format(self.ground_coverage)
         osd_1 = self.myfont.render(osd_text_1, False, (0, 0, 0))
         osd_2 = self.myfont.render(osd_text_2, False, (0, 0, 0))
         osd_3 = self.myfont.render(osd_text_3, False, (0, 0, 0))

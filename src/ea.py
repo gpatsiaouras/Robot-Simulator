@@ -16,6 +16,8 @@ GROUND_WEIGHT = 0.7
 # Evolutionary Algorithm
 NUMBER_OF_PARENTS_MATING = 4
 
+ROOM_TO_USE = rooms.room_3
+
 np.set_printoptions(precision=2)
 
 
@@ -38,7 +40,7 @@ def calculate_distance(list_vectors):
 
 def run_chromosome_on_simulator(weights1, weights2, steps=-1):
     # Demonstrate on the simulator
-    sim = Simulator(rooms.room_1, max_steps=steps, autonomous=True, pygame_enabled=True)
+    sim = Simulator(ROOM_TO_USE, max_steps=steps, autonomous=True, pygame_enabled=True)
     sim.network.weights1 = weights1
     sim.network.weights2 = weights2
     sim.run()
@@ -130,7 +132,7 @@ class EvolutionaryAlgorithm:
         else:
             population = start_population
 
-        simulator = Simulator(rooms.room_1, self.exploration_steps, autonomous=True, pygame_enabled=False)
+        simulator = Simulator(ROOM_TO_USE, self.exploration_steps, autonomous=True, pygame_enabled=False)
         for generation in range(start_gen, self.number_of_generations):
             start = time.time()
             print("\nGeneration {0}#".format(generation))
@@ -148,6 +150,7 @@ class EvolutionaryAlgorithm:
             self.fitness_average.append(np.average(fitness))
             self.fitness_maximum.append(np.max(fitness))
             print("\nFitness: " + str(fitness))
+            print("Max Fitness: {0:.2f}".format(np.max(fitness)))
 
             # Select the best parents in the population
             parents = self.select_mating_pool(population, fitness, NUMBER_OF_PARENTS_MATING)
@@ -202,7 +205,7 @@ if __name__ == '__main__':
     evolutionary_algorithm = EvolutionaryAlgorithm(
         number_of_generations=30,
         robots_per_generation=10,
-        exploration_steps=1000,
+        exploration_steps=2000,
         save_each=2
     )
 
