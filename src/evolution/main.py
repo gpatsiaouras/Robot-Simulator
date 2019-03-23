@@ -1,7 +1,7 @@
 import numpy as np
-from Environment import Environment
-from ann import ANN
-from robot import Robot
+from evolution.Environment import Environment
+from evolution.ann import ANN
+from evolution.robot import Robot
 import pygame
 import rooms
 
