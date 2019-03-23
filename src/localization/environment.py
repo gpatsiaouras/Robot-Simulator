@@ -103,7 +103,7 @@ class Environment:
         osd_text_1 = 'Robot Velocity:'
         osd_text_2 = 'Linear Velocity:{0}'.format(self.robot.linear_velocity)
         osd_text_3 = 'Angular Velocity:{0}'.format(self.robot.angular_velocity)
-        osd_text_4 = 'Theta:{0:.2f}'.format(self.robot.theta)
+        osd_text_4 = 'Theta:{0:.2f}'.format(self.robot.actual_theta)
         osd_1 = self.font.render(osd_text_1, False, (0, 0, 0))
         osd_2 = self.font.render(osd_text_2, False, (0, 0, 0))
         osd_3 = self.font.render(osd_text_3, False, (0, 0, 0))
@@ -116,24 +116,24 @@ class Environment:
     def draw_robot(self):
         # Draw the circle of the robot
         self.robot.robot_rect = pygame.draw.circle(self.gameDisplay, self.BLACK,
-                                                   [int(self.robot.position[0]), int(self.robot.position[1])],
+                                                   [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
                                                    self.robot.radius, 3)
 
         # Draw the small line indicating the direction that the robot is moving
         # End_x and end_y represent where the small line should end, starting from the centre of the circle
-        end_x = self.robot.radius * np.cos(2 * np.pi + self.robot.theta)
-        end_y = self.robot.radius * np.sin(2 * np.pi + self.robot.theta)
+        end_x = self.robot.radius * np.cos(2 * np.pi + self.robot.actual_theta)
+        end_y = self.robot.radius * np.sin(2 * np.pi + self.robot.actual_theta)
 
         # Draw the line
         pygame.draw.line(self.gameDisplay, self.BLACK,
-                         [int(self.robot.position[0]), int(self.robot.position[1])],
-                         [int(self.robot.position[0] + end_x), int(self.robot.position[1] + end_y)],
+                         [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
+                         [int(self.robot.actual_position[0] + end_x), int(self.robot.actual_position[1] + end_y)],
                          3)
 
         # Draw robot sensor range
         pygame.draw.circle(self.gameDisplay,
                            self.GREEN if len(self.robot.intercepting_beacons_positions) == 0 else self.RED,
-                           [int(self.robot.position[0]), int(self.robot.position[1])],
+                           [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
                            self.robot.sensor_max_radius, 3)
 
     def draw_beacons(self):
@@ -142,13 +142,15 @@ class Environment:
                                [int(beacon[0]), int(beacon[1])], self.BEACON_DIAMETER, 10)
 
     def draw_path(self):
-        for position in self.robot.path:
+        for position in self.robot.actual_path:
             pygame.draw.circle(self.gameDisplay, self.BLUE, [int(position[0]), int(position[1])], 1)
+        for position in self.robot.noiseless_path:
+            pygame.draw.circle(self.gameDisplay, self.GREEN, [int(position[0]), int(position[1])], 1)
 
     def draw_interceptions(self):
         for intercepting_beacon in self.robot.intercepting_beacons_positions:
             pygame.draw.line(self.gameDisplay, self.RED,
-                             [int(self.robot.position[0]), int(self.robot.position[1])],
+                             [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
                              [int(intercepting_beacon[0]), int(intercepting_beacon[1])],
                              3)
 
