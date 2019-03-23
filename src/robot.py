@@ -1,8 +1,6 @@
 import numpy as np
 from math import hypot as hyp
 
-from numpy.linalg import LinAlgError
-
 
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position):
@@ -22,18 +20,23 @@ class Robot:
 
         # Sensors
         self.sensors_values = []
-        self.sensors_rects = []
         self.sensors_parameters = np.zeros((12, 2))
         self.init_sensors()
 
-        # walls for sensor values
-        self.walls = []
-        self.walls_parameters = np.zeros((4, 2))
+        # obstacles for sensor values
+        self.obstacles_coords = []
+        self.obstacles_parameters = np.zeros((4, 2))
 
         # Collision Data (for evolution algorithm)
         self.collisions = 0
 
-        self.robot_rect = None
+    def reset(self, theta, position):
+        self.theta = theta
+        self.position = position
+        self.update_sensor_values()
+        self.collisions = 0
+        self.left_wheel_velocity = 0
+        self.right_wheel_velocity = 0
 
     def update_sensor_values(self):
         count = 0
@@ -89,9 +92,6 @@ class Robot:
             self.position[0] = self.position[0] + (self.right_wheel_velocity * np.cos(self.theta))
             self.position[1] = self.position[1] + (self.right_wheel_velocity * np.sin(self.theta))
 
-        # Move the pygame rectangle object so that the check collision can evaluate with the new position
-        self.robot_rect.move_ip(self.position[0] - old_position[0], self.position[1] - old_position[1])
-
         # Check if the new move caused a collision
         if self.check_collision():
             # Undo the move
@@ -110,15 +110,32 @@ class Robot:
         velocity_hor = 0
         velocity_ver = 0
 
-        for wall in self.walls:
-            if self.robot_rect.colliderect(wall):
+        for obstacle_id in range(len(self.obstacles_parameters)):
+            # print("Obstacle {0}: {1}".format(obstacle_id, self.obstacles_parameters[obstacle_id][0]))
+            # Vertical Obstacle
+            if np.isinf(self.obstacles_parameters[obstacle_id][0]):
+                distance = np.abs(self.position[0] - self.obstacles_coords[obstacle_id][0])
+                is_inside_the_limits_of_the_line = [
+                    self.obstacles_coords[obstacle_id][3] < self.position[1] < self.obstacles_coords[obstacle_id][1]]
+            # Horizontal Obstacle
+            elif self.obstacles_parameters[obstacle_id][0] == 0:
+                distance = np.abs(self.position[1] - self.obstacles_coords[obstacle_id][1])
+                is_inside_the_limits_of_the_line = [
+                    self.obstacles_coords[obstacle_id][2] > self.position[0] > self.obstacles_coords[obstacle_id][0]]
+            else:
+                distance = np.abs(-self.obstacles_parameters[obstacle_id][0] * self.position[0] + self.position[1] -
+                                  self.obstacles_parameters[obstacle_id][1]) / \
+                           np.sqrt((-self.obstacles_parameters[obstacle_id][0]) ** 2 + 1)
+                is_inside_the_limits_of_the_line = False
+
+            if is_inside_the_limits_of_the_line and distance <= self.radius + 10:
                 velocity_hor = np.cos(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity) / 2
                 velocity_ver = np.sin(self.theta) * (self.right_wheel_velocity + self.left_wheel_velocity) / 2
 
-                if wall.width > 5:
+                if self.obstacles_parameters[obstacle_id][0] == 0:
                     # self.velocity_ver = 0
                     cap_ver = 0
-                if wall.height > 5:
+                if np.isinf(self.obstacles_parameters[obstacle_id][0]):
                     # self.velocity_hor = 0
                     cap_hor = 0
 
@@ -166,47 +183,94 @@ class Robot:
         self.sens_radius = 100 + self.radius
         self.update_sensor_values()
 
-    def setObst(self, walls, walls_params):
-        self.walls = walls
-        self.walls_parameters = walls_params
+    def set_obstacles(self, obstacles_coords, obstacles_params):
+        self.obstacles_coords = obstacles_coords
+        self.obstacles_parameters = obstacles_params
 
     def check_sensors(self):
-        for sensor in range(len(self.sensors_rects)):
-            for wall in range(len(self.walls)):
-                if self.sensors_rects[sensor].colliderect(self.walls[wall]):
-                    wall_params = self.walls_parameters[wall]
-                    sensor_params = self.sensors_parameters[sensor]
-                    a = np.array([[wall_params[0], 1], [sensor_params[0], 1]])
-                    b = np.array([wall_params[1], sensor_params[1]])
+        for sensor_id in range(len(self.sensors_coords)):
+            for obstacle_id in range(len(self.obstacles_coords)):
+                intersection_point = self.getIntersectingPoint(self.sensors_coords[sensor_id],
+                                                               self.obstacles_coords[obstacle_id])
 
-                    if wall_params[0] != float('inf'):
-                        # print("sensor coord: ", self.sensors_coords[sensor])
-                        # print("sensor params: ", self.sensors_parameters[sensor])
-                        # print("wall params: ", self.walls_parameters[wall])
-                        try:
-                            intersection_coord = np.linalg.solve(a, b)
-                            intersection_coord[0] = -intersection_coord[0]
-                        except LinAlgError:
-                            # print("no collision between wall ", wall, " and sensor ", sensor)
-                            return
+                if intersection_point:
+                    self.sensors_values[sensor_id] = np.sqrt(
+                        (intersection_point[0] - self.sensors_coords[sensor_id, 0]) ** 2 + (
+                                intersection_point[1] - self.sensors_coords[sensor_id, 1]) ** 2)
 
-                    else:
-                        intersection_coord = [self.walls[wall][0],
-                                              sensor_params[0] * self.walls[wall][0] + sensor_params[1]]
-
-                    self.sensors_values[sensor] = np.sqrt(
-                        (intersection_coord[0] - self.sensors_coords[sensor, 0]) ** 2 + (
-                                intersection_coord[1] - self.sensors_coords[sensor, 1]) ** 2)
-
-                    if self.sensors_values[sensor] < 100:
-                        self.sensors_coords[sensor, 2] = intersection_coord[0]
-                        self.sensors_coords[sensor, 3] = intersection_coord[1]
+                    if self.sensors_values[sensor_id] < 100:
+                        self.sensors_coords[sensor_id, 2] = intersection_point[0]
+                        self.sensors_coords[sensor_id, 3] = intersection_point[1]
 
     def check_collision(self):
-        count_collisions = 0
-        for wall in self.walls:
-            if self.robot_rect.colliderect(wall):
-                count_collisions += 1
-        if count_collisions > 0:
-            return True
+        for obstacle_id in range(len(self.obstacles_parameters)):
+            if np.isinf(self.obstacles_parameters[obstacle_id][0]):
+                distance = np.abs(self.position[0] - self.obstacles_coords[obstacle_id][0])
+                if self.position[1] < min(self.obstacles_coords[obstacle_id][1], self.obstacles_coords[obstacle_id][3]):
+                    is_not_in_range = False
+                elif self.position[1] > max(self.obstacles_coords[obstacle_id][1], self.obstacles_coords[obstacle_id][3]):
+                    is_not_in_range = False
+                else:
+                    is_not_in_range = True
+            elif self.obstacles_parameters[obstacle_id][0] == 0:
+                distance = np.abs(self.position[1] - self.obstacles_coords[obstacle_id][1])
+                if self.position[0] < min(self.obstacles_coords[obstacle_id][0], self.obstacles_coords[obstacle_id][2]):
+                    is_not_in_range = False
+                elif self.position[0] > max(self.obstacles_coords[obstacle_id][0], self.obstacles_coords[obstacle_id][2]):
+                    is_not_in_range = False
+                else:
+                    is_not_in_range = True
+            else:
+                distance = np.abs(-self.obstacles_parameters[obstacle_id][0] * self.position[0] + self.position[1] -
+                                  self.obstacles_parameters[obstacle_id][1]) / \
+                           np.sqrt((-self.obstacles_parameters[obstacle_id][0]) ** 2 + 1)
+                is_not_in_range = True
+
+            if is_not_in_range and distance <= self.radius:
+                return True
         return False
+
+    def getIntersectingPoint(self, line1, line2):
+        """ If the given lines are intersecting, return the position of this intersection, otherwise false """
+
+        line1_p1 = [line1[0], line1[1]]
+        line1_p2 = [line1[2], line1[3]]
+        line2_p1 = [line2[0], line2[1]]
+        line2_p2 = [line2[2], line2[3]]
+
+        # Check if a line intersection is possible within range
+        if ((line1_p1[0] > line2_p1[0] and line1_p1[0] > line2_p2[0] and line1_p2[0] > line2_p1[0] and line1_p2[0] >
+             line2_p2[0]) or
+                (line1_p1[0] < line2_p1[0] and line1_p1[0] < line2_p2[0] and line1_p2[0] < line2_p1[0] and line1_p2[0] <
+                 line2_p2[0]) or
+                (line1_p1[1] > line2_p1[1] and line1_p1[1] > line2_p2[1] and line1_p2[1] > line2_p1[1] and line1_p2[1] >
+                 line2_p2[1]) or
+                (line1_p1[1] < line2_p1[1] and line1_p1[1] < line2_p2[1] and line1_p2[1] < line2_p1[1] and line1_p2[1] <
+                 line2_p2[1])):
+            return False
+
+        # Get axis differences
+        diffX = (line1_p1[0] - line1_p2[0], line2_p1[0] - line2_p2[0])
+        diffY = (line1_p1[1] - line1_p2[1], line2_p1[1] - line2_p2[1])
+
+        # Get intersection
+        d = np.linalg.det([diffX, diffY])
+        if d == 0:
+            return False
+        det = (np.linalg.det([line1_p1, line1_p2]), np.linalg.det([line2_p1, line2_p2]))
+        x = np.linalg.det([det, diffX]) / d
+        y = np.linalg.det([det, diffY]) / d
+
+        # Check if it is within range
+        margin = 0.0001
+        if (x < min(line1_p1[0], line1_p2[0]) - margin or
+                x > max(line1_p1[0], line1_p2[0]) + margin or
+                y < min(line1_p1[1], line1_p2[1]) - margin or
+                y > max(line1_p1[1], line1_p2[1]) + margin or
+                x < min(line2_p1[0], line2_p2[0]) - margin or
+                x > max(line2_p1[0], line2_p2[0]) + margin or
+                y < min(line2_p1[1], line2_p2[1]) - margin or
+                y > max(line2_p1[1], line2_p2[1]) + margin):
+            return False
+
+        return x, y
