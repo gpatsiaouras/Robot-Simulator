@@ -134,3 +134,26 @@ beacons_room_4 = [
     [CENTER_W + 200, CENTER_H],
     [CENTER_W, CENTER_H + 200]
 ]
+
+beacons_empty = [
+    [0 + PADDING, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, 0 + PADDING],
+    [0 + PADDING, SCREEN_HEIGHT - PADDING],
+    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING],
+    [100, 100],
+    [300, 100],
+    [500, 100],
+    [700, 100],
+    [100, 300],
+    [300, 300],
+    [500, 300],
+    [700, 300],
+    [100, 500],
+    [300, 500],
+    [500, 500],
+    [700, 500],
+    [100, 700],
+    [300, 700],
+    [500, 700],
+    [700, 700],
+]
