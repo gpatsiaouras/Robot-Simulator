@@ -12,7 +12,7 @@ class Environment:
     LIGHTYELLOW = (250, 235, 215)
     LIGHTGREEN = (144, 238, 144)
     ROBOT_DIAMETER = 50
-    BEACON_DIAMETER = 10
+    BEACON_DIAMETER = 20
     PADDING = 50
 
     def __init__(self, width=800, height=800, obstacles=None, beacons=None, robot=None):
@@ -132,14 +132,17 @@ class Environment:
 
         # Draw robot sensor range
         pygame.draw.circle(self.gameDisplay,
-                           self.GREEN if len(self.robot.intercepting_beacons_positions) == 0 else self.RED,
+                           self.GREEN if len(self.robot.intercepting_beacons_triplets) == 0 else self.RED,
                            [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
                            self.robot.sensor_max_radius, 3)
 
     def draw_beacons(self):
-        for beacon in self.beacons:
+        for beacon_id in range(len(self.beacons)):
             pygame.draw.circle(self.gameDisplay, self.RED,
-                               [int(beacon[0]), int(beacon[1])], self.BEACON_DIAMETER, 10)
+                               [int(self.beacons[beacon_id][0]), int(self.beacons[beacon_id][1])], self.BEACON_DIAMETER, self.BEACON_DIAMETER)
+            beacon_name_text = str(beacon_id)
+            beacon_name = self.font.render(beacon_name_text, False, self.WHITE)
+            self.gameDisplay.blit(beacon_name, (int(self.beacons[beacon_id][0] - 10), int(self.beacons[beacon_id][1] - 10)))
 
     def draw_path(self):
         for position in self.robot.actual_path:
@@ -148,10 +151,10 @@ class Environment:
             pygame.draw.circle(self.gameDisplay, self.GREEN, [int(position[0]), int(position[1])], 1)
 
     def draw_interceptions(self):
-        for intercepting_beacon in self.robot.intercepting_beacons_positions:
+        for intercepting_beacon in self.robot.intercepting_beacons_triplets:
             pygame.draw.line(self.gameDisplay, self.RED,
                              [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
-                             [int(intercepting_beacon[0]), int(intercepting_beacon[1])],
+                             [int(self.beacons[intercepting_beacon[2]][0]), int(self.beacons[intercepting_beacon[2]][1])],
                              3)
 
     def render(self):
