@@ -68,11 +68,13 @@ class Robot:
             self.actual_theta %= 2 * np.pi
             self.perceived_theta %= 2 * np.pi
 
-            self.kalman.prediction([self.linear_velocity, self.angular_velocity])
+            self.kalman.prediction(np.matrix([[self.linear_velocity], [self.angular_velocity]]))
             self.kalman.correction(self.beacons_estimates_position)
 
-            self.corrected_path.append([self.kalman.predicted_states_history[0], self.kalman.predicted_states_history[1]])
+            # self.corrected_path.append([self.kalman.predicted_states_history, self.kalman.predicted_states_history[1]])
+            self.corrected_path = self.kalman.predicted_states_history
 
+            # self.pe
 
     def check_beacons(self):
         self.intercepting_beacons_triplets = []
@@ -92,7 +94,7 @@ class Robot:
                     bearing,
                     beacon_id
                 ])
-                estimated_positions.append([x, y])
+                estimated_positions.append([x, y, theta])
                 # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
         if len(estimated_positions):
             self.beacons_estimates_position = np.average(estimated_positions, axis=0)

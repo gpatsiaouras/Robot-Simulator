@@ -1,13 +1,13 @@
 import numpy as np
 import random
 
-from localization.main import Simulator
-from localization.robot import Robot
+# from localization.main import Simulator
+# from localization.robot import Robot
 
 
 class Kalman:
 
-    def __init__(self, robot: Robot):
+    def __init__(self, robot):
         self.robot = robot
         # self.simulator = simulator
 
@@ -17,7 +17,8 @@ class Kalman:
         self.A = np.eye(3)
         self.B = np.matrix([[np.cos(self.robot.perceived_theta), 0],
                             [np.sin(self.robot.perceived_theta), 0],
-                            0, 1])  # 1 because delta_t is 1.
+                            [0, 1]
+                            ])  # 1 because delta_t is 1.
         self.movement = np.matrix([[self.robot.linear_velocity], [self.robot.angular_velocity]])
 
         # initialize uncertainties with small values on diagonal of identity
