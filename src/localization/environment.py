@@ -146,8 +146,8 @@ class Environment:
         #                    self.robot.sensor_max_radius, 3)
         # Draw where the robot thinks that sees the sensors
         for beacon_triplet in self.robot.intercepting_beacons_triplets:
-            end_x_sensor = self.robot.radius * np.cos(2 * np.pi + beacon_triplet[1])
-            end_y_sensor = self.robot.radius * np.sin(2 * np.pi + beacon_triplet[1])
+            end_x_sensor = self.robot.radius * np.cos(2 * np.pi + beacon_triplet[1] + self.robot.actual_theta)
+            end_y_sensor = self.robot.radius * np.sin(2 * np.pi + beacon_triplet[1] + self.robot.actual_theta)
             pygame.draw.line(self.background, self.BLUE,
                              [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
                              [int(self.robot.actual_position[0] + end_x_sensor),

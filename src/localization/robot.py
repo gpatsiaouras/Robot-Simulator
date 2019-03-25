@@ -157,7 +157,7 @@ class Robot:
         return np.arctan2(
             self.beacons[beacon_id][1] - self.actual_position[1],
             self.beacons[beacon_id][0] - self.actual_position[0]
-        )
+        ) - self.actual_theta
 
     """
     In order to estimate the position from only one beacon we are going
@@ -167,7 +167,7 @@ class Robot:
     """
 
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        x = self.beacons[beacon_triplet[2]][0] + np.sin(beacon_triplet[1] - np.pi / 2) * beacon_triplet[0]
-        y = self.beacons[beacon_triplet[2]][1] - np.cos(beacon_triplet[1] - np.pi / 2) * beacon_triplet[0]
+        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.noiseless_theta) * beacon_triplet[0]
+        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.noiseless_theta) * beacon_triplet[0]
 
         return x, y, beacon_triplet[1]
