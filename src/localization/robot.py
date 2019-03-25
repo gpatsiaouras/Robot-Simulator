@@ -8,11 +8,13 @@ class Robot:
         # Robot specifications
         self.diameter = diameter
         self.radius = int(diameter / 2)
+        self.dead_reckoning_position = initial_position
         self.perceived_position = initial_position
         self.actual_position = initial_position
         self.sensor_max_radius = 170
 
         # Rotation is in rads
+        self.dead_reckoning_theta = initial_theta
         self.perceived_theta = initial_theta
         self.actual_theta = initial_theta
 
@@ -37,7 +39,7 @@ class Robot:
         self.intercepting_beacons_triplets = []
 
         # Path followed
-        self.noiseless_path = []
+        self.dead_reckoning_path = []
         self.actual_path = []
         self.corrected_path = []
         self.beacons_path = []
@@ -49,32 +51,31 @@ class Robot:
         self.check_beacons()
 
         if self.linear_velocity != 0 or self.angular_velocity != 0:
-            new_noiseless_position, new_noiseless_theta = self.get_noiseless_position()
+            new_dead_reckoning_position, new_dead_reckoning_theta = self.get_dead_reckoning_position()
             new_actual_position, new_actual_theta = self.get_actual_position()
 
             # update positions
             self.actual_position = new_actual_position
-            self.perceived_position = new_noiseless_position
+            self.dead_reckoning_position = new_dead_reckoning_position
 
             # update thetas
             self.actual_theta = new_actual_theta
-            self.perceived_theta = new_noiseless_theta
+            self.dead_reckoning_theta = new_dead_reckoning_theta
 
             # Save paths
-            self.noiseless_path.append(new_noiseless_position)
+            self.dead_reckoning_path.append(new_dead_reckoning_position)
             self.actual_path.append(new_actual_position)
 
             # Keep theta from exploding
             self.actual_theta %= 2 * np.pi
-            self.perceived_theta %= 2 * np.pi
+            self.dead_reckoning_theta %= 2 * np.pi
 
-            self.kalman.prediction(np.matrix([[self.linear_velocity], [self.angular_velocity]]))
-            self.kalman.correction(self.beacons_estimates_position)
+            # self.kalman.prediction(np.matrix([[self.linear_velocity], [self.angular_velocity]]))
+            # correction = self.kalman.correction(self.beacons_estimates_position)
 
-            # self.corrected_path.append([self.kalman.predicted_states_history, self.kalman.predicted_states_history[1]])
-            self.corrected_path = self.kalman.predicted_states_history
+            # self.corrected_path.append()
 
-            # self.pe
+            # self.perceived_theta = self.kalman.sta
 
     def check_beacons(self):
         self.intercepting_beacons_triplets = []
@@ -135,7 +136,7 @@ class Robot:
         self.actual_position = position
         self.perceived_position = position
         self.actual_path = []
-        self.noiseless_path = []
+        self.dead_reckoning_path = []
         self.beacons_path = []
         self.linear_velocity = 0
         self.angular_velocity = 0
@@ -146,12 +147,12 @@ class Robot:
     def get_random_noise(self, aggression):
         return np.random.randint(-2, 2) / aggression
 
-    def get_noiseless_position(self):
+    def get_dead_reckoning_position(self):
         new_position = [
-            self.perceived_position[0] + np.cos(self.perceived_theta) * self.linear_velocity,
-            self.perceived_position[1] + np.sin(self.perceived_theta) * self.linear_velocity
+            self.dead_reckoning_position[0] + np.cos(self.dead_reckoning_theta) * self.linear_velocity,
+            self.dead_reckoning_position[1] + np.sin(self.dead_reckoning_theta) * self.linear_velocity
         ]
-        new_theta = self.perceived_theta + self.angular_velocity
+        new_theta = self.dead_reckoning_theta + self.angular_velocity
 
         return new_position, new_theta
 
@@ -176,7 +177,7 @@ class Robot:
 
     """
     In order to estimate the position from only one beacon we are going
-    to use our noiseless_theta that the robot thinks it has.
+    to use our perceived_theta that the robot thinks it has.
     The sensor model takes as input the beacon measurement triplet that has
     r (distance to beacon), φ (angle to beacon), s (id of beacon)
     """

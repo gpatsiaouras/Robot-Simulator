@@ -167,7 +167,7 @@ class Environment:
     def draw_path(self):
         for position in self.robot.actual_path:
             pygame.draw.circle(self.background, self.BLUE, [int(position[0]), int(position[1])], 1)
-        for position in self.robot.noiseless_path:
+        for position in self.robot.dead_reckoning_path:
             pygame.draw.circle(self.background, self.GREEN, [int(position[0]), int(position[1])], 1)
         for position in self.robot.beacons_path:
             pygame.draw.circle(self.background, (127, 127, 127), [int(position[0]), int(position[1])], 3)
