@@ -1,12 +1,14 @@
 import numpy as np
 
+from localization.kalman import Kalman
+
 
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position, beacons):
         # Robot specifications
         self.diameter = diameter
         self.radius = int(diameter / 2)
-        self.noiseless_position = initial_position
+        self.perceived_position = initial_position
         self.actual_position = initial_position
         self.sensor_max_radius = 170
 
@@ -37,7 +39,11 @@ class Robot:
         # Path followed
         self.noiseless_path = []
         self.actual_path = []
+        self.corrected_path = []
         self.beacons_path = []
+
+        # Kalman Filters
+        self.kalman = Kalman(self)
 
     def move(self):
         self.check_beacons()
@@ -48,7 +54,7 @@ class Robot:
 
             # update positions
             self.actual_position = new_actual_position
-            self.noiseless_position = new_noiseless_position
+            self.perceived_position = new_noiseless_position
 
             # update thetas
             self.actual_theta = new_actual_theta
@@ -61,6 +67,12 @@ class Robot:
             # Keep theta from exploding
             self.actual_theta %= 2 * np.pi
             self.perceived_theta %= 2 * np.pi
+
+            self.kalman.prediction([self.linear_velocity, self.angular_velocity])
+            self.kalman.correction(self.beacons_estimates_position)
+
+            self.corrected_path.append([self.kalman.predicted_states_history[0], self.kalman.predicted_states_history[1]])
+
 
     def check_beacons(self):
         self.intercepting_beacons_triplets = []
@@ -83,7 +95,8 @@ class Robot:
                 estimated_positions.append([x, y])
                 # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
         if len(estimated_positions):
-            self.beacons_path.append(np.average(estimated_positions, axis=0))
+            self.beacons_estimates_position = np.average(estimated_positions, axis=0)
+            self.beacons_path.append(self.beacons_estimates_position)
 
     def increment_linear_velocity(self):
         self.angular_velocity = 0
@@ -118,7 +131,7 @@ class Robot:
         self.actual_theta = theta
         self.perceived_theta = theta
         self.actual_position = position
-        self.noiseless_position = position
+        self.perceived_position = position
         self.actual_path = []
         self.noiseless_path = []
         self.beacons_path = []
@@ -133,8 +146,8 @@ class Robot:
 
     def get_noiseless_position(self):
         new_position = [
-            self.noiseless_position[0] + np.cos(self.perceived_theta) * self.linear_velocity,
-            self.noiseless_position[1] + np.sin(self.perceived_theta) * self.linear_velocity
+            self.perceived_position[0] + np.cos(self.perceived_theta) * self.linear_velocity,
+            self.perceived_position[1] + np.sin(self.perceived_theta) * self.linear_velocity
         ]
         new_theta = self.perceived_theta + self.angular_velocity
 

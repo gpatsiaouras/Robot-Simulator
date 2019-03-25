@@ -170,8 +170,9 @@ class Environment:
         for position in self.robot.noiseless_path:
             pygame.draw.circle(self.background, self.GREEN, [int(position[0]), int(position[1])], 1)
         for position in self.robot.beacons_path:
-            # print(position)
             pygame.draw.circle(self.background, (127, 127, 127), [int(position[0]), int(position[1])], 3)
+        for position in self.robot.corrected_path:
+            pygame.draw.circle(self.background, (255, 0, 255), [int(position[0]), int(position[1])], 3)
 
     def draw_interceptions(self):
         for intercepting_beacon in self.robot.intercepting_beacons_triplets:

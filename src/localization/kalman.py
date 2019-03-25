@@ -7,9 +7,9 @@ from localization.robot import Robot
 
 class Kalman:
 
-    def __init__(self, robot: Robot, simulator: Simulator):
+    def __init__(self, robot: Robot):
         self.robot = robot
-        self.simulator = simulator
+        # self.simulator = simulator
 
         self.n = 3
         self.predicted_state = np.zeros(self.n)
@@ -57,6 +57,9 @@ class Kalman:
 
         self.predicted_states_history.append(self.corrected_state)
         self.predicted_sigma_covariance_history.append(self.corrected_sigma)
+
+        self.previous_state = self.corrected_state
+        self.predicted_sigma_covariance = self.corrected_sigma
 
         return self.corrected_state, self.corrected_sigma
 
