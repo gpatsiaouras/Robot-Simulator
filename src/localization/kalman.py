@@ -8,7 +8,6 @@ from localization.robot import Robot
 class Kalman:
 
     def __init__(self, robot: Robot, simulator: Simulator):
-
         self.robot = robot
         self.simulator = simulator
 
@@ -18,7 +17,7 @@ class Kalman:
         self.A = np.eye(3)
         self.B = np.matrix([[np.cos(self.robot.perceived_theta), 0],
                             [np.sin(self.robot.perceived_theta), 0],
-                            0, 1]) # 1 because delta_t is 1.
+                            0, 1])  # 1 because delta_t is 1.
         self.movement = np.matrix([[self.robot.linear_velocity], [self.robot.angular_velocity]])
 
         # initialize uncertainties with small values on diagonal of identity
@@ -50,19 +49,16 @@ class Kalman:
     def correction(self, sensor_estimated_state):
         self.sensor_estimated_state = sensor_estimated_state * self.C + self.delta
 
-        self.kalman = self.predicted_sigma_covariance * self.C.T * np.linalg.inv(self.C * self.predicted_sigma_covariance * self.C.T + self.sensor_model_covariance)
-        self.corrected_state = self.predicted_state + self.kalman * (self.sensor_estimated_state - self.C * self.predicted_state)
+        self.kalman = self.predicted_sigma_covariance * self.C.T * np.linalg.inv(
+            self.C * self.predicted_sigma_covariance * self.C.T + self.sensor_model_covariance)
+        self.corrected_state = self.predicted_state + self.kalman * (
+                self.sensor_estimated_state - self.C * self.predicted_state)
         self.corrected_sigma = (np.eye(self.n) - self.kalman * self.C) * self.predicted_sigma_covariance
 
         self.predicted_states_history.append(self.corrected_state)
         self.predicted_sigma_covariance_history.append(self.corrected_sigma)
 
         return self.corrected_state, self.corrected_sigma
-
-
-
-
-
 
 #
 #     # first and second state coordinates third one identifies the landmark

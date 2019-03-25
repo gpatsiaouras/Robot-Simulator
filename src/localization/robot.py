@@ -167,7 +167,9 @@ class Robot:
     """
 
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.perceived_theta) * beacon_triplet[0]
-        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.perceived_theta) * beacon_triplet[0]
+        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.perceived_theta) * \
+            beacon_triplet[0]
+        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.perceived_theta) * \
+            beacon_triplet[0]
 
         return x, y, beacon_triplet[1]
