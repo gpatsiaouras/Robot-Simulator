@@ -63,6 +63,9 @@ class Environment:
         # Add beacons
         self.beacons = beacons
 
+    def get_beacons(self):
+        return self.beacons
+
     def reset_background(self):
         # Draw everything white
         self.gameDisplay.fill(self.WHITE)
