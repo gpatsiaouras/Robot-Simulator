@@ -11,7 +11,7 @@ class Robot:
         self.sensor_max_radius = 170
 
         # Rotation is in rads
-        self.noiseless_theta = initial_theta
+        self.perceived_theta = initial_theta
         self.actual_theta = initial_theta
 
         # Values between 100 and 1000 give reasonable trajectories
@@ -52,7 +52,7 @@ class Robot:
 
             # update thetas
             self.actual_theta = new_actual_theta
-            self.noiseless_theta = new_noiseless_theta
+            self.perceived_theta = new_noiseless_theta
 
             # Save paths
             self.noiseless_path.append(new_noiseless_position)
@@ -60,7 +60,7 @@ class Robot:
 
             # Keep theta from exploding
             self.actual_theta %= 2 * np.pi
-            self.noiseless_theta %= 2 * np.pi
+            self.perceived_theta %= 2 * np.pi
 
     def check_beacons(self):
         self.intercepting_beacons_triplets = []
@@ -116,7 +116,7 @@ class Robot:
 
     def reset(self, theta, position):
         self.actual_theta = theta
-        self.noiseless_theta = theta
+        self.perceived_theta = theta
         self.actual_position = position
         self.noiseless_position = position
         self.actual_path = []
@@ -133,10 +133,10 @@ class Robot:
 
     def get_noiseless_position(self):
         new_position = [
-            self.noiseless_position[0] + np.cos(self.noiseless_theta) * self.linear_velocity,
-            self.noiseless_position[1] + np.sin(self.noiseless_theta) * self.linear_velocity
+            self.noiseless_position[0] + np.cos(self.perceived_theta) * self.linear_velocity,
+            self.noiseless_position[1] + np.sin(self.perceived_theta) * self.linear_velocity
         ]
-        new_theta = self.noiseless_theta + self.angular_velocity
+        new_theta = self.perceived_theta + self.angular_velocity
 
         return new_position, new_theta
 
@@ -167,7 +167,7 @@ class Robot:
     """
 
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.noiseless_theta) * beacon_triplet[0]
-        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.noiseless_theta) * beacon_triplet[0]
+        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.perceived_theta) * beacon_triplet[0]
+        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.perceived_theta) * beacon_triplet[0]
 
         return x, y, beacon_triplet[1]

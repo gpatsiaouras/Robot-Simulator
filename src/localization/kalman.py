@@ -16,8 +16,8 @@ class Kalman:
         self.predicted_state = np.zeros(self.n)
         self.previous_state = np.zeros(self.n)
         self.A = np.eye(3)
-        self.B = np.matrix([[np.cos(self.robot.noiseless_theta), 0],
-                            [np.sin(self.robot.noiseless_theta), 0],
+        self.B = np.matrix([[np.cos(self.robot.perceived_theta), 0],
+                            [np.sin(self.robot.perceived_theta), 0],
                             0, 1]) # 1 because delta_t is 1.
         self.movement = np.matrix([[self.robot.linear_velocity], [self.robot.angular_velocity]])
 
