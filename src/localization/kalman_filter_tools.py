@@ -40,23 +40,28 @@ def gauss_pdf(X, M, S):
     return P[0], E[0]
 
 
-class Kalman:
-    def __init__(self):
-        # time step of mobile movement
-        dt = 1
+if __name__ == '__main__':
+    # time step of mobile movement
+    dt = 0.1
 
-        # Initialization of state matrices
-        X = np.array([[0.0], [0.0], [0.1], [0.1]])
-        P = np.diag((0.01, 0.01, 0.01, 0.01))
-        A = np.array([[1, 0, dt, 0], [0, 1, 0, dt], [0, 0, 1, 0], [0, 0, 0, 1]])
-        Q = np.eye(X.shape[0])
-        B = np.eye(X.shape[0])
-        U = np.zeros((X.shape[0], 1))
+    # Initialization of state matrices
+    X = np.array([[0.0], [0.0], [0.1], [0.1]])
+    P = np.diag((0.01, 0.01, 0.01, 0.01))
+    A = np.array([[1, 0, dt, 0], [0, 1, 0, dt], [0, 0, 1, 0], [0, 0, 0, 1]])
+    Q = np.eye(X.shape[0])
+    B = np.eye(X.shape[0])
+    U = np.zeros((X.shape[0], 1))
 
-        # Measurement matrices
-        Y = np.array([[X[0, 0] + np.abs(np.random.randn(1)[0])], [X[1, 0] + np.abs(np.random.randn(1)[0])]])
-        H = np.array([[1, 0, 0, 0], [0, 1, 0, 0]])
-        R = np.eye(Y.shape[0])
+    # Measurement matrices
+    Y = np.array([[X[0, 0] + np.abs(np.random.randn(1)[0])], [X[1, 0] + np.abs(np.random.randn(1)[0])]])
+    H = np.array([[1, 0, 0, 0], [0, 1, 0, 0]])
+    R = np.eye(Y.shape[0])
 
-        # Number of iterations in Kalman Filter
-        N_iter = 50
+    # Number of iterations in Kalman Filter
+    N_iter = 50
+
+    # Applying the Kalman Filter
+    for i in np.arange(0, N_iter):
+        X, P = kf_predict(X, P, A, Q, B, U)
+        X, P, K, IM, IS, LH = kf_update(X, P, Y, H, R)
+        Y = np.array([[X[0, 0] + abs(0.1 * np.random.randn(1)[0])], [X[1, 0] + np.abs(0.1 * np.random.randn(1)[0])]])
