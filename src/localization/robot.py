@@ -1,9 +1,5 @@
 import numpy as np
 
-# Values between 100 and 1000 give reasonable trajectories
-# higher values result in more aggression
-AGGRESSION = 600
-
 
 class Robot:
     def __init__(self, diameter, initial_theta, initial_position, beacons):
@@ -17,6 +13,12 @@ class Robot:
         # Rotation is in rads
         self.noiseless_theta = initial_theta
         self.actual_theta = initial_theta
+
+        # Values between 100 and 1000 give reasonable trajectories
+        # higher values result in less aggression
+        self.aggression = 200
+        self.MIN_AGGRESSION = 1
+        self.MAX_AGGRESSION = 1000
 
         # Velocities
         self.MAX_SPEED_LINEAR = 5
@@ -64,19 +66,24 @@ class Robot:
         self.intercepting_beacons_triplets = []
         estimated_positions = []
         for beacon_id in range(len(self.beacons)):
-            distance = self.get_distance_from_beacon(self.beacons[beacon_id])
-            bearing = self.get_bearing_from_beacon(beacon_id)
+            distance = self.get_distance_from_beacon(self.beacons[beacon_id]) + self.get_random_noise(self.aggression)
+            bearing = self.get_bearing_from_beacon(beacon_id) + self.get_random_noise(self.aggression)
             if distance <= self.sensor_max_radius:
                 self.intercepting_beacons_triplets.append([
                     distance,
                     bearing,
                     beacon_id
                 ])
-                x, y, theta = self.get_estimated_position_from_one_beacon_measurement(
-                    self.intercepting_beacons_triplets[-1])
+
+                x, y, theta = self.get_estimated_position_from_one_beacon_measurement([
+                    distance,
+                    bearing,
+                    beacon_id
+                ])
                 estimated_positions.append([x, y])
-                print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
-        self.beacons_path.append(np.average(estimated_positions, axis=0))
+                # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
+        if len(estimated_positions):
+            self.beacons_path.append(np.average(estimated_positions, axis=0))
 
     def increment_linear_velocity(self):
         self.angular_velocity = 0
@@ -94,6 +101,14 @@ class Robot:
     def decrement_angular_velocity(self):
         if self.angular_velocity - 0.05 >= self.MIN_SPEED_ANGULAR:
             self.angular_velocity -= 0.05
+
+    def increase_noise_factor(self):
+        if self.aggression + 10 <= self.MAX_AGGRESSION:
+            self.aggression += 10
+
+    def decrease_noise_factor(self):
+        if self.aggression - 10 >= self.MIN_AGGRESSION:
+            self.aggression -= 10
 
     def stop_motors(self):
         self.angular_velocity = 0
@@ -127,8 +142,8 @@ class Robot:
 
     def get_actual_position(self):
         # Add noise to the trajectory of the robot
-        actual_linear_velocity = self.linear_velocity + self.get_random_noise(AGGRESSION)
-        actual_angular_velocity = self.angular_velocity + self.get_random_noise(AGGRESSION)
+        actual_linear_velocity = self.linear_velocity + self.get_random_noise(self.aggression)
+        actual_angular_velocity = self.angular_velocity + self.get_random_noise(self.aggression)
 
         new_position = [
             self.actual_position[0] + np.cos(self.actual_theta) * actual_linear_velocity,
@@ -142,7 +157,7 @@ class Robot:
         return np.arctan2(
             self.beacons[beacon_id][1] - self.actual_position[1],
             self.beacons[beacon_id][0] - self.actual_position[0]
-        ) - self.actual_theta
+        )
 
     """
     In order to estimate the position from only one beacon we are going
@@ -150,8 +165,9 @@ class Robot:
     The sensor model takes as input the beacon measurement triplet that has
     r (distance to beacon), φ (angle to beacon), s (id of beacon)
     """
-    def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        x = self.actual_position[0] + np.sin(self.noiseless_theta) * beacon_triplet[0]
-        y = self.actual_position[1] + np.cos(self.noiseless_theta) * beacon_triplet[0]
 
-        return x, y, self.noiseless_theta
+    def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
+        x = self.beacons[beacon_triplet[2]][0] + np.sin(beacon_triplet[1] - np.pi / 2) * beacon_triplet[0]
+        y = self.beacons[beacon_triplet[2]][1] - np.cos(beacon_triplet[1] - np.pi / 2) * beacon_triplet[0]
+
+        return x, y, beacon_triplet[1]

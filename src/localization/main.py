@@ -23,7 +23,7 @@ class Simulator:
     def reset(self):
         self.game_exit = False
         self.current_step = 0
-        self.robot.reset(theta=0, position=[100, 100])
+        self.robot.reset(theta=0, position=[60, 60])
         self.env.render()
 
     def run(self):
@@ -44,6 +44,10 @@ class Simulator:
                         self.robot.decrement_angular_velocity()
                     if event.key == pygame.K_d:
                         self.robot.increment_angular_velocity()
+                    if event.key == pygame.K_p:
+                        self.robot.increase_noise_factor()
+                    if event.key == pygame.K_l:
+                        self.robot.decrease_noise_factor()
                     if event.key == pygame.K_x:
                         self.robot.stop_motors()
                     if event.key == pygame.K_z:
@@ -56,5 +60,5 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(rooms.room_4, rooms.beacons_room_4)
+    simulator = Simulator(rooms.empty_room, rooms.beacons_empty)
     simulator.run()
