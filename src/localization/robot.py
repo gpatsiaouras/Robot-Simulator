@@ -46,6 +46,7 @@ class Robot:
 
         # Kalman Filters
         self.kalman = Kalman(self)
+        self.beacons_estimates_position = 0
 
     def move(self):
         self.check_beacons()
@@ -72,11 +73,10 @@ class Robot:
 
             self.kalman.prediction(np.array([[self.linear_velocity],
                                              [self.angular_velocity]]))
-            state, covariance = self.kalman.correction(np.array(self.beacons_estimates_position.T))
+            state, covariance = self.kalman.correction(np.array(self.beacons_estimates_position))
 
             # self.corrected_path.append()
-
-            self.perceived_theta = state[2]
+            self.perceived_theta = state.item(2)
 
             print("****  DEBUG ****")
             print("kalman position = ", state)
@@ -101,9 +101,8 @@ class Robot:
                 ])
                 estimated_positions.append(np.array([[x], [y], [theta]]))
                 # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
-        if len(estimated_positions):
-            self.beacons_estimates_position = estimated_positions.pop()
-            self.beacons_path.append(self.beacons_estimates_position)
+        if len(estimated_positions) > 0:
+            self.beacons_estimates_position = estimated_positions[-1]
 
     def increment_linear_velocity(self):
         self.angular_velocity = 0

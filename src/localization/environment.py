@@ -165,15 +165,14 @@ class Environment:
                                  (int(self.beacons[beacon_id][0] - 10), int(self.beacons[beacon_id][1] - 10)))
 
     def draw_path(self):
-        pass
-        # for position in self.robot.actual_path:
-        #     pygame.draw.circle(self.background, self.BLUE, [int(position[0]), int(position[1])], 1)
-        # for position in self.robot.dead_reckoning_path:
-        #     pygame.draw.circle(self.background, self.GREEN, [int(position[0]), int(position[1])], 1)
+        for position in self.robot.actual_path:
+            pygame.draw.circle(self.background, self.BLUE, [int(position[0]), int(position[1])], 1)
+        for position in self.robot.dead_reckoning_path:
+            pygame.draw.circle(self.background, self.GREEN, [int(position[0]), int(position[1])], 1)
         # for position in self.robot.beacons_path:
         #     pygame.draw.circle(self.background, (127, 127, 127), [int(position[0]), int(position[1])], 3)
-        # for position in self.robot.corrected_path:
-        #     pygame.draw.circle(self.background, (255, 0, 255), [int(position[0].reshape(-1, 1)[0]), int(position[1].reshape(-1, 1)[0])], 3)
+        for position in self.robot.kalman.predicted_states_history:
+            pygame.draw.circle(self.background, (255, 0, 255), [int(position.item(0)), int(position.item(1))], 3)
 
 
     def draw_interceptions(self):
