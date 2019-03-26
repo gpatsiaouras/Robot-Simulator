@@ -76,6 +76,7 @@ class Robot:
             state, covariance = self.kalman.correction(np.array(self.beacons_estimates_position))
 
             # self.corrected_path.append()
+            self.perceived_position = [state.item(0), state.item(1)]
             self.perceived_theta = state.item(2)
 
             print("****  DEBUG ****")
@@ -94,15 +95,17 @@ class Robot:
                     beacon_id
                 ])
 
-                x, y, theta = self.get_estimated_position_from_one_beacon_measurement([
+                x, y = self.get_estimated_position_from_one_beacon_measurement([
                     distance,
                     bearing,
                     beacon_id
                 ])
+                theta = self.get_estimated_theta_from_one_beacon(x, y, beacon_id, bearing)
                 estimated_positions.append(np.array([[x], [y], [theta]]))
                 # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
         if len(estimated_positions) > 0:
             self.beacons_estimates_position = estimated_positions[-1]
+            self.beacons_path.append([estimated_positions[-1].item(0), estimated_positions[-1].item(1)])
 
     def increment_linear_velocity(self):
         self.angular_velocity = 0
@@ -186,12 +189,16 @@ class Robot:
     """
 
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        # try:
         x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.perceived_theta) * \
             beacon_triplet[0]
         y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.perceived_theta) * \
             beacon_triplet[0]
-        # except:
-        #     pass
 
-        return x, y, beacon_triplet[1]
+        return x, y
+
+    def get_estimated_theta_from_one_beacon(self, x, y, beacon_id, bearing):
+        dy = self.beacons[beacon_id][1] - y
+        dx = self.beacons[beacon_id][0] - x
+
+        a = np.arctan2(dy, dx)
+        return 2 * np.pi - a - bearing

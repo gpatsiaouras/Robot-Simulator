@@ -38,14 +38,17 @@ class Kalman:
 
         self.delta = np.eye(self.n) * np.random.uniform(0, 0.15)
 
+        self.corrected_states_history = []
         self.predicted_states_history = []
-        self.predicted_sigma_covariance_history = []
+        self.corrected_sigma_covariance_history = []
 
     def prediction(self, movement):
         self.movement = movement
 
         self.predicted_state = np.dot(self.A, self.previous_state) + np.dot(self.B, self.movement)
         self.predicted_sigma_covariance = self.A * self.previous_sigma_covariance * self.A.T + self.motion_model_covariance
+
+        self.predicted_states_history.append(self.predicted_state)
 
     def correction(self, sensor_estimated_state):
         # self.sensor_estimated_state = sensor_estimated_state * self.C + self.delta
@@ -57,8 +60,8 @@ class Kalman:
                 self.sensor_estimated_state - np.dot(self.C, self.predicted_state)))
         self.corrected_sigma = (np.eye(self.n) - self.kalman * self.C) * self.predicted_sigma_covariance
 
-        self.predicted_states_history.append(self.corrected_state)
-        self.predicted_sigma_covariance_history.append(self.corrected_sigma)
+        self.corrected_states_history.append(self.corrected_state)
+        self.corrected_sigma_covariance_history.append(self.corrected_sigma)
 
         self.previous_state = self.corrected_state
         self.predicted_sigma_covariance = self.corrected_sigma

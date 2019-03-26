@@ -1,8 +1,8 @@
-from evolution.main import SCREEN_WIDTH
-from evolution.main import SCREEN_HEIGHT
-from evolution.main import PADDING
-from evolution.main import CENTER_W
-from evolution.main import CENTER_H
+from localization.main import SCREEN_WIDTH
+from localization.main import SCREEN_HEIGHT
+from localization.main import PADDING
+from localization.main import CENTER_W
+from localization.main import CENTER_H
 
 empty_room = [
     [0 + PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING, 0 + PADDING],

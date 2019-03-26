@@ -12,7 +12,7 @@ class Environment:
     LIGHTYELLOW = (250, 235, 215)
     LIGHTGREEN = (144, 238, 144)
     ROBOT_DIAMETER = 50
-    BEACON_DIAMETER = 20
+    BEACON_DIAMETER = 15
     PADDING = 50
 
     def __init__(self, width=800, height=800, obstacles=None, beacons=None, robot=None):
@@ -24,7 +24,8 @@ class Environment:
         """
 
         # initialize dimension of the world
-        self.width = width
+        self.legend_width = 400
+        self.width = width + self.legend_width
         self.height = height
 
         pygame.init()
@@ -106,20 +107,20 @@ class Environment:
 
     def draw_osd(self):
         osd_text_1 = 'Robot Velocity:'
-        osd_text_2 = 'Linear Velocity:{0}'.format(self.robot.linear_velocity)
-        osd_text_3 = 'Angular Velocity:{0}'.format(self.robot.angular_velocity)
-        osd_text_4 = 'Theta:{0:.2f}'.format(self.robot.actual_theta)
-        osd_text_5 = 'Noise Factor:{0}'.format(self.robot.aggression)
+        osd_text_2 = 'Linear Velocity:    {0}'.format(self.robot.linear_velocity)
+        osd_text_3 = 'Angular Velocity: {0}'.format(self.robot.angular_velocity)
+        osd_text_4 = 'Theta:            {0:.2f}'.format(self.robot.actual_theta)
+        osd_text_5 = 'Noise Factor:     {0}'.format(self.robot.aggression)
         osd_1 = self.font.render(osd_text_1, False, (0, 0, 0))
         osd_2 = self.font.render(osd_text_2, False, (0, 0, 0))
         osd_3 = self.font.render(osd_text_3, False, (0, 0, 0))
         osd_4 = self.font.render(osd_text_4, False, (0, 0, 0))
         osd_5 = self.font.render(osd_text_5, False, (0, 0, 0))
-        self.background.blit(osd_1, (20, self.height - 140))
-        self.background.blit(osd_2, (20, self.height - 120))
-        self.background.blit(osd_3, (20, self.height - 100))
-        self.background.blit(osd_4, (20, self.height - 80))
-        self.background.blit(osd_5, (20, self.height - 60))
+        self.background.blit(osd_1, (self.width - 300, 20))
+        self.background.blit(osd_2, (self.width - 300, 60))
+        self.background.blit(osd_3, (self.width - 300, 80))
+        self.background.blit(osd_4, (self.width - 300, 100))
+        self.background.blit(osd_5, (self.width - 300, 120))
 
     def draw_robot(self):
         # Draw the circle of the robot
@@ -169,15 +170,17 @@ class Environment:
             pygame.draw.circle(self.background, self.BLUE, [int(position[0]), int(position[1])], 1)
         for position in self.robot.dead_reckoning_path:
             pygame.draw.circle(self.background, self.GREEN, [int(position[0]), int(position[1])], 1)
-        # for position in self.robot.beacons_path:
-        #     pygame.draw.circle(self.background, (127, 127, 127), [int(position[0]), int(position[1])], 3)
-        for position in self.robot.kalman.predicted_states_history:
+        for position in self.robot.beacons_path:
+            pygame.draw.circle(self.background, (127, 127, 127), [int(position[0]), int(position[1])], 3)
+        for position in self.robot.kalman.corrected_states_history:
             pygame.draw.circle(self.background, (255, 0, 255), [int(position.item(0)), int(position.item(1))], 3)
+        for position in self.robot.kalman.predicted_states_history:
+            pygame.draw.circle(self.background, (255, 255, 0), [int(position.item(0)), int(position.item(1))], 3)
 
 
     def draw_interceptions(self):
         for intercepting_beacon in self.robot.intercepting_beacons_triplets:
-            pygame.draw.line(self.background, self.RED,
+            pygame.draw.line(self.background, self.BLUE,
                              [int(self.robot.actual_position[0]), int(self.robot.actual_position[1])],
                              [int(self.beacons[intercepting_beacon[2]][0]),
                               int(self.beacons[intercepting_beacon[2]][1])],
@@ -188,7 +191,7 @@ class Environment:
         # Draw components. Ordering of draw matters for the window to look nice
         self.draw_robot()
         self.draw_beacons()
-        # self.draw_interceptions()
+        self.draw_interceptions()
         self.draw_path()
         self.draw_osd()
         self.draw_obstacles()

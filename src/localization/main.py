@@ -6,7 +6,7 @@ import rooms
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 ROBOT_DIAMETER = 50
-PADDING = 10
+PADDING = 20
 CENTER_W = SCREEN_WIDTH / 2
 CENTER_H = SCREEN_HEIGHT / 2
 
@@ -60,5 +60,5 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(rooms.empty_room, rooms.beacons_empty)
+    simulator = Simulator(rooms.room_1, rooms.beacons_room_1)
     simulator.run()
