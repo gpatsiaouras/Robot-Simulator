@@ -20,9 +20,9 @@ class Robot:
 
         # Values between 100 and 1000 give reasonable trajectories
         # higher values result in less aggression
-        self.aggression = 200
-        self.MIN_AGGRESSION = 1
-        self.MAX_AGGRESSION = 1000
+        self.aggression = 10
+        self.MIN_AGGRESSION = 5
+        self.MAX_AGGRESSION = 200
         self.THETA_NOISE = 0.1
 
         # Velocities
@@ -127,12 +127,12 @@ class Robot:
             self.angular_velocity -= 0.05
 
     def increase_noise_factor(self):
-        if self.aggression + 10 <= self.MAX_AGGRESSION:
-            self.aggression += 10
+        if self.aggression + 5 <= self.MAX_AGGRESSION:
+            self.aggression += 5
 
     def decrease_noise_factor(self):
-        if self.aggression - 10 >= self.MIN_AGGRESSION:
-            self.aggression -= 10
+        if self.aggression - 5 >= self.MIN_AGGRESSION:
+            self.aggression -= 5
 
     def stop_motors(self):
         self.angular_velocity = 0
@@ -158,7 +158,7 @@ class Robot:
         return np.sqrt((self.actual_position[0] - beacon[0]) ** 2 + (self.actual_position[1] - beacon[1]) ** 2)
 
     def get_random_noise(self, aggression):
-        return np.random.randint(-2, 2) / aggression
+        return aggression * np.random.randint(-1, 1) / 1000
 
     def get_dead_reckoning_position(self):
         new_position = [

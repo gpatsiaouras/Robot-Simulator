@@ -106,21 +106,53 @@ class Environment:
                              (self.obstacles_coord[count][2], self.obstacles_coord[count][3]), 3)
 
     def draw_osd(self):
-        osd_text_1 = 'Robot Velocity:'
-        osd_text_2 = 'Linear Velocity:    {0}'.format(self.robot.linear_velocity)
-        osd_text_3 = 'Angular Velocity: {0}'.format(self.robot.angular_velocity)
-        osd_text_4 = 'Theta:            {0:.2f}'.format(self.robot.actual_theta)
-        osd_text_5 = 'Noise Factor:     {0}'.format(self.robot.aggression)
+        osd_text_1 = "Robot Velocity:"
+        osd_text_2 = "Linear Velocity:    {0}".format(self.robot.linear_velocity)
+        osd_text_3 = "Angular Velocity: {0}".format(self.robot.angular_velocity)
+        osd_text_4 = "Theta:            {0:.2f}".format(self.robot.actual_theta)
+        osd_text_5 = "Noise Factor:     {0}".format(self.robot.aggression)
+        color_text_1 = "Actual Trajectory"
+        color_text_2 = "Dead reckoning Trajectory"
+        color_text_3 = "Corrected Trajectory"
+        color_text_4 = "Predicted Trajectory"
+        color_text_5 = "Perceived Trajectory"
+        help_text_1 = "W,S: Inc/Dec Linear Velocity"
+        help_text_2 = "A,D: Inc/Dec Angular Velocity"
+        help_text_4 = "P,L: Inc/Dec Noise factor"
+        help_text_3 = "Z,X: Reset / Stop"
         osd_1 = self.font.render(osd_text_1, False, (0, 0, 0))
         osd_2 = self.font.render(osd_text_2, False, (0, 0, 0))
         osd_3 = self.font.render(osd_text_3, False, (0, 0, 0))
         osd_4 = self.font.render(osd_text_4, False, (0, 0, 0))
         osd_5 = self.font.render(osd_text_5, False, (0, 0, 0))
+        color_1 = self.font.render(color_text_1, False, (0, 0, 0))
+        color_2 = self.font.render(color_text_2, False, (0, 0, 0))
+        color_3 = self.font.render(color_text_3, False, (0, 0, 0))
+        color_4 = self.font.render(color_text_4, False, (0, 0, 0))
+        color_5 = self.font.render(color_text_5, False, (0, 0, 0))
+        help_1 = self.font.render(help_text_1, False, (0, 0, 0))
+        help_2 = self.font.render(help_text_2, False, (0, 0, 0))
+        help_3 = self.font.render(help_text_3, False, (0, 0, 0))
+        help_4 = self.font.render(help_text_4, False, (0, 0, 0))
+        pygame.draw.circle(self.background, self.BLUE, [self.width - 400, self.height - 250], 10)
+        pygame.draw.circle(self.background, self.GREEN, [self.width - 400, self.height - 230], 10)
+        pygame.draw.circle(self.background, (255, 0, 255), [self.width - 400, self.height - 210], 10)
+        pygame.draw.circle(self.background, (255, 255, 0), [self.width - 400, self.height - 190], 10)
+        pygame.draw.circle(self.background, (127, 127, 127), [self.width - 400, self.height - 170], 10)
         self.background.blit(osd_1, (self.width - 300, 20))
         self.background.blit(osd_2, (self.width - 300, 60))
         self.background.blit(osd_3, (self.width - 300, 80))
         self.background.blit(osd_4, (self.width - 300, 100))
         self.background.blit(osd_5, (self.width - 300, 120))
+        self.background.blit(color_1, (self.width - 350, self.height - 260))
+        self.background.blit(color_2, (self.width - 350, self.height - 240))
+        self.background.blit(color_3, (self.width - 350, self.height - 220))
+        self.background.blit(color_4, (self.width - 350, self.height - 200))
+        self.background.blit(color_5, (self.width - 350, self.height - 180))
+        self.background.blit(help_1, (self.width - 350, self.height - 120))
+        self.background.blit(help_2, (self.width - 350, self.height - 100))
+        self.background.blit(help_3, (self.width - 350, self.height - 80))
+        self.background.blit(help_4, (self.width - 350, self.height - 60))
 
     def draw_robot(self):
         # Draw the circle of the robot
