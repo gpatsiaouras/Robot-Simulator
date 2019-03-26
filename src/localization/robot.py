@@ -1,5 +1,5 @@
 import numpy as np
-
+import random
 from localization.kalman import Kalman
 
 
@@ -18,8 +18,6 @@ class Robot:
         self.perceived_theta = initial_theta
         self.actual_theta = initial_theta
 
-        # Values between 100 and 1000 give reasonable trajectories
-        # higher values result in less aggression
         self.aggression = 10
         self.MIN_AGGRESSION = 5
         self.MAX_AGGRESSION = 200
@@ -76,10 +74,8 @@ class Robot:
                                              [self.angular_velocity]]))
             state, covariance = self.kalman.correction(np.array(self.beacons_estimates_position))
 
-            # self.corrected_path.append()
             self.perceived_position = [state.item(0), state.item(1)]
             self.perceived_theta = state.item(2)
-            # self.perceived_theta = self.kalman.predicted_states_history[-1]
 
             print("kalman theta= ", self.perceived_theta, "         real theta= ", self.actual_theta)
 
@@ -105,7 +101,6 @@ class Robot:
                 estimated_positions.append(np.array([[x], [y], [theta]]))
                 # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
         if len(estimated_positions) > 0:
-            # self.beacons_estimates_position = estimated_positions[-1]
             self.beacons_estimates_position = np.average(estimated_positions, axis=0)
             self.beacons_path.append([estimated_positions[-1].item(0), estimated_positions[-1].item(1)])
 
@@ -188,13 +183,6 @@ class Robot:
             self.beacons[beacon_id][0] - self.actual_position[0]
         ) - self.actual_theta
 
-    """
-    In order to estimate the position from only one beacon we are going
-    to use our perceived_theta that the robot thinks it has.
-    The sensor model takes as input the beacon measurement triplet that has
-    r (distance to beacon), φ (angle to beacon), s (id of beacon)
-    """
-
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
         x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, self.THETA_NOISE)) * \
             beacon_triplet[0]
@@ -203,21 +191,13 @@ class Robot:
 
         return x, y
 
-    # def get_estimated_theta_from_one_beacon(self, x, y, beacon_id, bearing):
-    #     dy = self.beacons[beacon_id][1] - y
-    #     dx = self.beacons[beacon_id][0] - x
-    #
-    #     a = np.arctan2(dy, dx)
-    #     # print("\n\nalpha = ", a, "\n\n")
-    #     return (2 * np.pi - a - bearing) % 2*np.pi
-
     def get_estimated_theta_from_one_beacon(self, x, y, beacon_id, bearing):
         dy = self.beacons[beacon_id][1] - y
         dx = self.beacons[beacon_id][0] - x
-        # dy = self.beacons[beacon_id][1] - self.actual_position[1]
-        # dx = self.beacons[beacon_id][0] - self.actual_position[0]
 
         a = np.arctan2(dy, dx)
-        # print("\n\nalpha = ", a, "\n\n")
-        # return (2 * np.pi - a - bearing) % 2*np.pi
-        return (- bearing + a)
+        return - bearing + a
+
+    def kidnap_robot(self):
+        self.actual_position = [random.randint(30, 750), random.randint(30, 750)]
+        self.actual_theta = random.uniform(0, 2*np.pi)

@@ -1,15 +1,10 @@
 import numpy as np
-import random
-
-# from localization.main import Simulator
-# from localization.robot import Robot
 
 
 class Kalman:
 
     def __init__(self, robot):
         self.robot = robot
-        # self.simulator = simulator
 
         self.n = 3
         self.predicted_state = np.zeros((self.n, 1))

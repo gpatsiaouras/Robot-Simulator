@@ -52,6 +52,8 @@ class Simulator:
                         self.robot.stop_motors()
                     if event.key == pygame.K_z:
                         self.reset()
+                    if event.key == pygame.K_k:
+                        self.robot.kidnap_robot()
 
             pygame.display.update()
             self.env.clock.tick(25)
@@ -60,5 +62,5 @@ class Simulator:
 
 
 if __name__ == '__main__':
-    simulator = Simulator(rooms.room_1, rooms.beacons_room_1)
+    simulator = Simulator(rooms.empty_room, rooms.beacons_empty)
     simulator.run()
