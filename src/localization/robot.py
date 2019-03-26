@@ -23,6 +23,7 @@ class Robot:
         self.aggression = 200
         self.MIN_AGGRESSION = 1
         self.MAX_AGGRESSION = 1000
+        self.THETA_NOISE = 0.1
 
         # Velocities
         self.MAX_SPEED_LINEAR = 5
@@ -104,7 +105,8 @@ class Robot:
                 estimated_positions.append(np.array([[x], [y], [theta]]))
                 # print("Sensor {0}: {1:.2f} : {2:.2f}".format(beacon_id, distance, bearing))
         if len(estimated_positions) > 0:
-            self.beacons_estimates_position = estimated_positions[-1]
+            # self.beacons_estimates_position = estimated_positions[-1]
+            self.beacons_estimates_position = np.average(estimated_positions, axis=0)
             self.beacons_path.append([estimated_positions[-1].item(0), estimated_positions[-1].item(1)])
 
     def increment_linear_velocity(self):
@@ -139,11 +141,16 @@ class Robot:
     def reset(self, theta, position):
         self.actual_theta = theta
         self.perceived_theta = theta
+        self.dead_reckoning_theta = theta
         self.actual_position = position
         self.perceived_position = position
+        self.dead_reckoning_position = position
         self.actual_path = []
         self.dead_reckoning_path = []
         self.beacons_path = []
+        self.corrected_path = []
+        self.kalman.predicted_states_history = []
+        self.kalman.corrected_states_history = []
         self.linear_velocity = 0
         self.angular_velocity = 0
 
@@ -189,9 +196,9 @@ class Robot:
     """
 
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, 0.1)) * \
+        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, self.THETA_NOISE)) * \
             beacon_triplet[0]
-        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, 0.1)) * \
+        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, self.THETA_NOISE)) * \
             beacon_triplet[0]
 
         return x, y
