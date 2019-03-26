@@ -1,8 +1,8 @@
-from main import SCREEN_WIDTH
-from main import SCREEN_HEIGHT
-from main import PADDING
-from main import CENTER_W
-from main import CENTER_H
+from localization.main import SCREEN_WIDTH
+from localization.main import SCREEN_HEIGHT
+from localization.main import PADDING
+from localization.main import CENTER_W
+from localization.main import CENTER_H
 
 empty_room = [
     [0 + PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING, 0 + PADDING],
@@ -65,4 +65,95 @@ room_4 = [
     [CENTER_W, CENTER_H - 200, CENTER_W + 200, CENTER_H],
     [CENTER_W + 200, CENTER_H, CENTER_W, CENTER_H + 200],
     [CENTER_W, CENTER_H + 200, CENTER_W - 200, CENTER_H]
+]
+
+beacons_room_1 = [
+    [0 + PADDING, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, 0 + PADDING],
+    [0 + PADDING, SCREEN_HEIGHT - PADDING],
+    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING],
+    [0 + PADDING, CENTER_H],
+    [CENTER_W, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, CENTER_H],
+    [CENTER_W, SCREEN_HEIGHT - PADDING],
+    [CENTER_W - 100, CENTER_H - 100],
+    [CENTER_W + 100, CENTER_H - 100],
+    [CENTER_W - 100, CENTER_H + 100],
+    [CENTER_W + 100, CENTER_H + 100],
+]
+
+beacons_room_2 = [
+    [0 + PADDING, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, 0 + PADDING],
+    [0 + PADDING, SCREEN_HEIGHT - PADDING],
+    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING],
+    [0 + PADDING, CENTER_H],
+    [CENTER_W, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, CENTER_H],
+    [CENTER_W, SCREEN_HEIGHT - PADDING],
+    [100, 100],
+    [100, SCREEN_HEIGHT - 100],
+    [SCREEN_WIDTH - 100, 100],
+    [SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100]
+]
+
+beacons_room_3 = [
+    [0 + PADDING, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, 0 + PADDING],
+    [0 + PADDING, SCREEN_HEIGHT - PADDING],
+    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING],
+    [0 + PADDING, CENTER_H],
+    [CENTER_W, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, CENTER_H],
+    [CENTER_W, SCREEN_HEIGHT - PADDING],
+    [100, 100],
+    [SCREEN_WIDTH - 100, 100],
+    [SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100],
+    [100, SCREEN_HEIGHT - 100],
+    [100, 200],
+    [SCREEN_WIDTH - 200, 200],
+    [SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200],
+    [100, SCREEN_HEIGHT - 200],
+    [100, 350],
+    [100, 450],
+    [SCREEN_WIDTH - 400, 350],
+    [SCREEN_WIDTH - 400, 450]
+]
+
+beacons_room_4 = [
+    [0 + PADDING, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, 0 + PADDING],
+    [0 + PADDING, SCREEN_HEIGHT - PADDING],
+    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING],
+    [0 + PADDING, CENTER_H],
+    [CENTER_W, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, CENTER_H],
+    [CENTER_W, SCREEN_HEIGHT - PADDING],
+    [CENTER_W - 200, CENTER_H],
+    [CENTER_W, CENTER_H - 200],
+    [CENTER_W + 200, CENTER_H],
+    [CENTER_W, CENTER_H + 200]
+]
+
+beacons_empty = [
+    [0 + PADDING, 0 + PADDING],
+    [SCREEN_WIDTH - PADDING, 0 + PADDING],
+    [0 + PADDING, SCREEN_HEIGHT - PADDING],
+    [SCREEN_WIDTH - PADDING, SCREEN_HEIGHT - PADDING],
+    [100, 100],
+    [300, 100],
+    [500, 100],
+    [700, 100],
+    [100, 300],
+    [300, 300],
+    [500, 300],
+    [700, 300],
+    [100, 500],
+    [300, 500],
+    [500, 500],
+    [700, 500],
+    [100, 700],
+    [300, 700],
+    [500, 700],
+    [700, 700],
 ]
