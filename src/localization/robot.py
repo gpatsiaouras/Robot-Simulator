@@ -78,9 +78,9 @@ class Robot:
             # self.corrected_path.append()
             self.perceived_position = [state.item(0), state.item(1)]
             self.perceived_theta = state.item(2)
+            # self.perceived_theta = self.kalman.predicted_states_history[-1]
 
-            print("****  DEBUG ****")
-            print("kalman position = ", state)
+            print("kalman theta= ", self.perceived_theta, "         real theta= ", self.actual_theta)
 
     def check_beacons(self):
         self.intercepting_beacons_triplets = []
@@ -189,16 +189,28 @@ class Robot:
     """
 
     def get_estimated_position_from_one_beacon_measurement(self, beacon_triplet):
-        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - self.perceived_theta) * \
+        x = self.beacons[beacon_triplet[2]][0] + np.cos(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, 0.1)) * \
             beacon_triplet[0]
-        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - self.perceived_theta) * \
+        y = self.beacons[beacon_triplet[2]][1] - np.sin(np.pi - beacon_triplet[1] - np.random.normal(self.actual_theta, 0.1)) * \
             beacon_triplet[0]
 
         return x, y
 
+    # def get_estimated_theta_from_one_beacon(self, x, y, beacon_id, bearing):
+    #     dy = self.beacons[beacon_id][1] - y
+    #     dx = self.beacons[beacon_id][0] - x
+    #
+    #     a = np.arctan2(dy, dx)
+    #     # print("\n\nalpha = ", a, "\n\n")
+    #     return (2 * np.pi - a - bearing) % 2*np.pi
+
     def get_estimated_theta_from_one_beacon(self, x, y, beacon_id, bearing):
         dy = self.beacons[beacon_id][1] - y
         dx = self.beacons[beacon_id][0] - x
+        # dy = self.beacons[beacon_id][1] - self.actual_position[1]
+        # dx = self.beacons[beacon_id][0] - self.actual_position[0]
 
         a = np.arctan2(dy, dx)
-        return 2 * np.pi - a - bearing
+        # print("\n\nalpha = ", a, "\n\n")
+        # return (2 * np.pi - a - bearing) % 2*np.pi
+        return (- bearing + a)
