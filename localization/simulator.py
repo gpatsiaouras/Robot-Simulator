@@ -1,4 +1,4 @@
-from localization.environment import Environment
+from localization import Environment
 from localization.robot import Robot
 import pygame
 import rooms
@@ -59,8 +59,3 @@ class Simulator:
             self.env.clock.tick(25)
 
             self.current_step += 1
-
-
-if __name__ == '__main__':
-    simulator = Simulator(rooms.empty_room, rooms.beacons_empty)
-    simulator.run()

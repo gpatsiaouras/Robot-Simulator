@@ -1,16 +1,9 @@
 import numpy as np
-from evolution.Environment import Environment
-from evolution.ann import ANN
-from evolution.robot import Robot
+from evolution import Environment
+from evolution import ANN
+from evolution import Robot
 import pygame
-import rooms
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
-ROBOT_DIAMETER = 50
-PADDING = 10
-CENTER_W = SCREEN_WIDTH / 2
-CENTER_H = SCREEN_HEIGHT / 2
+from config import *
 
 
 class Simulator:
@@ -80,10 +73,3 @@ class Simulator:
             self.current_step += 1
             if self.max_steps != -1 and self.current_step >= self.max_steps:
                 self.game_exit = True
-
-
-if __name__ == '__main__':
-    simulator = Simulator(rooms.room_1, autonomous=False, pygame_enabled=True)
-    simulator.network.weights1 = np.random.rand(17, 5)
-    simulator.network.weights2 = np.random.rand(5, 2)
-    simulator.run()

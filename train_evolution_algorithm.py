@@ -2,8 +2,8 @@ import os
 import numpy as np
 import rooms
 import time
-from evolution.main import Simulator
-from evolution.ea_plotter import EvolutionaryAlgorithmPlotter
+from evolution import Simulator
+from evolution import EvolutionaryAlgorithmPlotter
 
 from scipy.spatial import distance
 

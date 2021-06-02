@@ -1,8 +1,8 @@
-from localization.main import SCREEN_WIDTH
-from localization.main import SCREEN_HEIGHT
-from localization.main import PADDING
-from localization.main import CENTER_W
-from localization.main import CENTER_H
+from config import SCREEN_WIDTH
+from config import SCREEN_HEIGHT
+from config import PADDING
+from config import CENTER_W
+from config import CENTER_H
 
 empty_room = [
     [0 + PADDING, 0 + PADDING, SCREEN_WIDTH - PADDING, 0 + PADDING],

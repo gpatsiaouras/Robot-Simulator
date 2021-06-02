@@ -17,8 +17,27 @@ robot explore as much of the room that it has as possible.
 beacons that the robot could see with a laser sensor and based on that information calculate the position where it is. 
 The data used was the odometry information from the wheels of the robot and the laser sensor.
 
+## Install
+```shell
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ## Run
 To run cd inside the src directory and execute the first command for evolution algorithm and second for localization
+For the evolution algorithm, run
+```
+python train_evolution_algorithm.py
+```
 
-    python3.6 evolution/main.py
-    python3.6 localization/main.py
+To manually run the simulators for evolution or localization algorithms run
+```
+python start_evolution_sim_manual.py
+```
+
+or
+
+```
+python start_localization_sim_manual.py
+```
